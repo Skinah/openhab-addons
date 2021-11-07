@@ -1023,6 +1023,11 @@
       <artifactId>org.openhab.binding.nzwateralerts</artifactId>
       <version>${project.version}</version>
     </dependency>
+	<dependency>
+      <groupId>org.openhab.addons.bundles</groupId>
+      <artifactId>org.openhab.binding.objectdetection</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.openhab.addons.bundles</groupId>
       <artifactId>org.openhab.binding.oceanic</artifactId>
