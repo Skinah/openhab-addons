@@ -12,7 +12,19 @@
  */
 package org.openhab.binding.ipcamera.internal;
 
-import static org.openhab.binding.ipcamera.internal.IpCameraBindingConstants.*;
+import static org.openhab.binding.ipcamera.internal.IpCameraBindingConstants.CHANNEL_ACTIVATE_ALARM_OUTPUT;
+import static org.openhab.binding.ipcamera.internal.IpCameraBindingConstants.CHANNEL_ANIMAL_ALARM;
+import static org.openhab.binding.ipcamera.internal.IpCameraBindingConstants.CHANNEL_AUTO_LED;
+import static org.openhab.binding.ipcamera.internal.IpCameraBindingConstants.CHANNEL_CAR_ALARM;
+import static org.openhab.binding.ipcamera.internal.IpCameraBindingConstants.CHANNEL_ENABLE_AUDIO_ALARM;
+import static org.openhab.binding.ipcamera.internal.IpCameraBindingConstants.CHANNEL_ENABLE_FTP;
+import static org.openhab.binding.ipcamera.internal.IpCameraBindingConstants.CHANNEL_ENABLE_LED;
+import static org.openhab.binding.ipcamera.internal.IpCameraBindingConstants.CHANNEL_ENABLE_MOTION_ALARM;
+import static org.openhab.binding.ipcamera.internal.IpCameraBindingConstants.CHANNEL_ENABLE_RECORDINGS;
+import static org.openhab.binding.ipcamera.internal.IpCameraBindingConstants.CHANNEL_FACE_DETECTED;
+import static org.openhab.binding.ipcamera.internal.IpCameraBindingConstants.CHANNEL_HUMAN_ALARM;
+import static org.openhab.binding.ipcamera.internal.IpCameraBindingConstants.CHANNEL_LAST_EVENT_DATA;
+import static org.openhab.binding.ipcamera.internal.IpCameraBindingConstants.CHANNEL_MOTION_ALARM;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -120,10 +132,14 @@ public class ReolinkHandler extends ChannelDuplexHandler {
                         ipCameraHandler.logger.debug("The GetAiStateResponse could not be parsed");
                         return;
                     }
-                    if (aiResponse[0].value.dog_cat.alarm_state == 1) {
-                        ipCameraHandler.setChannelState(CHANNEL_ANIMAL_ALARM, OnOffType.ON);
-                    } else {
-                        ipCameraHandler.setChannelState(CHANNEL_ANIMAL_ALARM, OnOffType.OFF);
+                    if (aiResponse[0].value.dog_cat != null) {
+                        // Not all cameras return dog_cat as a key (at least, not in older firmware).
+                        // Make sure the key is populated before checking the state
+                        if (aiResponse[0].value.dog_cat.alarm_state == 1) {
+                            ipCameraHandler.setChannelState(CHANNEL_ANIMAL_ALARM, OnOffType.ON);
+                        } else {
+                            ipCameraHandler.setChannelState(CHANNEL_ANIMAL_ALARM, OnOffType.OFF);
+                        }
                     }
                     if (aiResponse[0].value.face.alarm_state == 1) {
                         ipCameraHandler.setChannelState(CHANNEL_FACE_DETECTED, OnOffType.ON);
