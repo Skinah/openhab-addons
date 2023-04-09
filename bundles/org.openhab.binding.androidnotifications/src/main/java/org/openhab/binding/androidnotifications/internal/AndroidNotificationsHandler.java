@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2022 Contributors to the openHAB project
+ * Copyright (c) 2010-2023 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -114,17 +114,14 @@ public class AndroidNotificationsHandler extends BaseThingHandler {
         // "\"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGP6zwAAAgcBApo\"\r\n"
         // + "\"cMXEAAAAASUVORK5CYII=\"\r\n" + " ";
         byte[] decoded = Base64.getDecoder().decode(encoded);
-
-        "--myBoundary\r\n"
+        String content = "--myBoundary\r\n"
                 + "Content-Disposition: form-data; name=\"filename\"; filename=\"icon.png\"\r\n"
                 + "Content-Type: application/octet-stream" + "\r\n" + "Expires: 0\r\n" + "\r\n"
                 + "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGP6zwAAAgcBApocMXEAAAAASUVORK5CYII="
-                + "\r\n" + "--myBoundary" + "\r\n"
-                + "Content-Disposition: form-data; name=\"msg\"; filename=\"msg\"" + "\r\n" + "\r\n"
-                + "Tell me if this works please" + "\r\n" + "--myBoundary" + "\r\n"
+                + "\r\n" + "--myBoundary" + "\r\n" + "Content-Disposition: form-data; name=\"msg\"; filename=\"msg\""
+                + "\r\n" + "\r\n" + "Tell me if this works please" + "\r\n" + "--myBoundary" + "\r\n"
                 + "Content-Disposition: form-data; name=\"title\"; filename=\"title\"\r\n" + "\r\n"
-                + "Home Assistant\r\n" + "--myBoundary--\r\n"
-
+                + "Home Assistant\r\n" + "--myBoundary--\r\n";
 
         logger.info("Sending {} bytes to TV. Message:{}", Integer.toString(content.length()), content);
         Request request = httpClient.POST(tvIP);
