@@ -7,9 +7,7 @@
   <parent>
     <groupId>org.openhab.addons</groupId>
     <artifactId>org.openhab.addons.reactor</artifactId>
-
     <version>4.2.0-SNAPSHOT</version>
-
   </parent>
 
   <groupId>org.openhab.addons.bundles</groupId>
@@ -30,7 +28,6 @@
     <!-- io -->
     <module>org.openhab.io.homekit</module>
     <module>org.openhab.io.hueemulation</module>
-    <module>org.openhab.io.imperihome</module>
     <module>org.openhab.io.metrics</module>
     <module>org.openhab.io.neeo</module>
     <module>org.openhab.io.openhabcloud</module>
@@ -237,7 +234,6 @@
     <module>org.openhab.binding.livisismarthome</module>
     <module>org.openhab.binding.logreader</module>
     <module>org.openhab.binding.loxone</module>
-    <module>org.openhab.binding.luftdateninfo</module>
     <module>org.openhab.binding.lutron</module>
     <module>org.openhab.binding.luxom</module>
     <module>org.openhab.binding.luxtronikheatpump</module>
@@ -283,7 +279,6 @@
     <module>org.openhab.binding.mybmw</module>
     <module>org.openhab.binding.mycroft</module>
     <module>org.openhab.binding.mynice</module>
-    <module>org.openhab.binding.myq</module>
     <module>org.openhab.binding.mystrom</module>
     <module>org.openhab.binding.nanoleaf</module>
     <module>org.openhab.binding.neato</module>
@@ -422,7 +417,6 @@
     <module>org.openhab.binding.tplinksmarthome</module>
     <module>org.openhab.binding.tr064</module>
     <module>org.openhab.binding.tradfri</module>
-    <module>org.openhab.binding.twitter</module>
     <module>org.openhab.binding.unifi</module>
     <module>org.openhab.binding.unifiedremote</module>
     <module>org.openhab.binding.upnpcontrol</module>
@@ -478,8 +472,6 @@
     <module>org.openhab.voice.mactts</module>
     <module>org.openhab.voice.marytts</module>
     <module>org.openhab.voice.mimictts</module>
-
-    <module>org.openhab.voice.actiontemplatehli</module>
     <module>org.openhab.voice.picotts</module>
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -490,7 +482,6 @@
 =======
 >>>>>>> 5795964170 (add to pom)
     <module>org.openhab.voice.pollytts</module>
-    <module>org.openhab.voice.porcupineks</module>
     <module>org.openhab.voice.rustpotterks</module>
     <module>org.openhab.voice.voicerss</module>
     <module>org.openhab.voice.voskstt</module>
