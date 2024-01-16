@@ -4,45 +4,105 @@
 	xmlns:thing="https://openhab.org/schemas/thing-description/v1.0.0"
 	xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
 
-	<!-- Sample Thing Type -->
-	<thing-type id="sample">
-		<!-- Comment this in for Things which need a Bridge to function.
-			<supported-bridge-type-refs>
-			<bridge-type-ref id="AndroidNotificationsBridge" />
-			</supported-bridge-type-refs>
-		-->
-
-		<label>AndroidNotifications Binding Thing</label>
-		<description>Sample thing for AndroidNotifications Binding</description>
+	<thing-type id="nfatvdisplay">
+		<label>Notifications for Android TV Display Connection</label>
+		<description>Notifications for Android TV is a Google Play store app by Christian Fees. Use this thing for each of
+			your TV's that have this app installed and setup correctly.</description>
 
 		<channels>
-			<channel id="channel1" typeId="sample-channel"/>
+			<channel id="lastMessageText" typeId="lastMessageText"/>
+			<channel id="lastMessageURL" typeId="lastMessageURL"/>
+			<channel id="lastMessageDate" typeId="lastMessageDate"/>
+			<channel id="lastMessageName" typeId="lastMessageName"/>
+			<channel id="lastMessageUsername" typeId="lastMessageUsername"/>
+			<channel id="chatId" typeId="chatId"/>
 		</channels>
 
 		<config-description>
-			<parameter name="hostname" type="text" required="true">
+			<parameter name="address" type="text" required="true">
 				<context>network-address</context>
-				<label>Hostname</label>
-				<description>Hostname or IP address of the device</description>
+				<label>Address</label>
+				<description>Enter just the IP or Hostname without the port or http/s</description>
 			</parameter>
-			<parameter name="password" type="text" required="true">
-				<context>password</context>
-				<label>Password</label>
-				<description>Password to access the device</description>
-			</parameter>
-			<parameter name="refreshInterval" type="integer" unit="s" min="1">
-				<label>Refresh Interval</label>
-				<description>Interval the device is polled in sec.</description>
-				<default>600</default>
+			<parameter name="port" type="integer" required="true" min="1" max="65535">
+				<label>Port</label>
+				<description>This port will be used for sending messages to your TV.
+				</description>
+				<default>7676</default>
 				<advanced>true</advanced>
 			</parameter>
 		</config-description>
 	</thing-type>
 
-	<!-- Sample Channel Type -->
-	<channel-type id="sample-channel">
-		<item-type>Number:Temperature</item-type>
-		<label>Example Temperature</label><!-- Use uppercase words, except prepositions. 2-3 words, max 25 chars -->
-		<description>Sample channel for AndroidNotifications Binding</description>
+	<thing-type id="tvoverlaydisplay">
+		<label>Tv Overlay Display Connection</label>
+		<description>TvOverlay is a Google Play store app by Tab Developer. Add one of these for each TV that is running the
+			correctly setup and working app.</description>
+
+		<channels>
+			<channel id="lastMessageText" typeId="lastMessageText"/>
+			<channel id="lastMessageURL" typeId="lastMessageURL"/>
+			<channel id="lastMessageDate" typeId="lastMessageDate"/>
+			<channel id="lastMessageName" typeId="lastMessageName"/>
+			<channel id="lastMessageUsername" typeId="lastMessageUsername"/>
+			<channel id="chatId" typeId="chatId"/>
+		</channels>
+
+		<config-description>
+			<parameter name="address" type="text" required="true">
+				<context>network-address</context>
+				<label>Address</label>
+				<description>Enter just the IP or Hostname without the port or http/s</description>
+			</parameter>
+			<parameter name="port" type="integer" required="true" min="1" max="65535">
+				<label>Port</label>
+				<description>This port will be used for sending messages to your TV.
+				</description>
+				<default>5001</default>
+				<advanced>true</advanced>
+			</parameter>
+		</config-description>
+	</thing-type>
+
+	<channel-type id="lastMessageText">
+		<item-type>String</item-type>
+		<label>Last Message Text</label>
+		<description>Contains the latest message text as a string</description>
+		<state readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="lastMessageURL">
+		<item-type>String</item-type>
+		<label>Last Message URL</label>
+		<description>Contains the URL of the latest message</description>
+		<state readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="lastMessageDate">
+		<item-type>DateTime</item-type>
+		<label>Last Message Date</label>
+		<description>Contains the latest message date as a DateTime</description>
+		<state readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="lastMessageName">
+		<item-type>String</item-type>
+		<label>Last Message Name</label>
+		<description>Contains the latest message senders name as a string</description>
+		<state readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="lastMessageUsername">
+		<item-type>String</item-type>
+		<label>Last Message Username</label>
+		<description>Contains the latest message senders username as a string</description>
+		<state readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="chatId">
+		<item-type>String</item-type>
+		<label>Chat Id</label>
+		<description>Contains the id of chat from where the message was received.</description>
+		<state readOnly="true"/>
 	</channel-type>
 </thing:thing-descriptions>

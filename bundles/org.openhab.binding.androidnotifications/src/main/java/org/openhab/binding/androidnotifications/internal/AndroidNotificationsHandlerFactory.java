@@ -12,13 +12,13 @@
  */
 package org.openhab.binding.androidnotifications.internal;
 
-import static org.openhab.binding.androidnotifications.internal.AndroidNotificationsBindingConstants.THING_TYPE_SAMPLE;
-
-import java.util.Set;
+import static org.openhab.binding.androidnotifications.internal.AndroidNotificationsBindingConstants.*;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.client.HttpClient;
+import org.openhab.binding.androidnotifications.internal.androidtvnotifications.AndroidTvNotificationsDisplayHandler;
+import org.openhab.binding.androidnotifications.internal.tvoverlay.TvOverlayDisplayHandler;
 import org.openhab.core.io.net.http.HttpClientFactory;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingTypeUID;
@@ -38,8 +38,6 @@ import org.osgi.service.component.annotations.Reference;
 @NonNullByDefault
 @Component(configurationPid = "binding.androidnotifications", service = ThingHandlerFactory.class)
 public class AndroidNotificationsHandlerFactory extends BaseThingHandlerFactory {
-
-    private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Set.of(THING_TYPE_SAMPLE);
     private final HttpClient httpClient;
 
     @Activate
@@ -49,17 +47,17 @@ public class AndroidNotificationsHandlerFactory extends BaseThingHandlerFactory 
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
-        return SUPPORTED_THING_TYPES_UIDS.contains(thingTypeUID);
+        return SUPPORTED_THING_TYPES.contains(thingTypeUID);
     }
 
     @Override
     protected @Nullable ThingHandler createHandler(Thing thing) {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
-
-        if (THING_TYPE_SAMPLE.equals(thingTypeUID)) {
-            return new AndroidNotificationsHandler(thing, httpClient);
+        if (NFATV_DISPLAY_THING_TYPE.equals(thingTypeUID)) {
+            return new AndroidTvNotificationsDisplayHandler(thing, httpClient);
+        } else if (TV_OVERLAY_DISPLAY_THING_TYPE.equals(thingTypeUID)) {
+            return new TvOverlayDisplayHandler(thing, httpClient);
         }
-
         return null;
     }
 }

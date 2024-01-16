@@ -12,6 +12,10 @@
  */
 package org.openhab.binding.androidnotifications.internal;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.core.thing.ThingTypeUID;
 
@@ -25,10 +29,19 @@ import org.openhab.core.thing.ThingTypeUID;
 public class AndroidNotificationsBindingConstants {
 
     private static final String BINDING_ID = "androidnotifications";
+    public static final int HTTP_TIMEOUT_SECONDS = 10;
 
-    // List of all Thing Type UIDs
-    public static final ThingTypeUID THING_TYPE_SAMPLE = new ThingTypeUID(BINDING_ID, "sample");
+    // List of all Things and Thing Types
+    public static final String NFATV_DISPLAY_THING = "nfatvdisplay";
+    public static final ThingTypeUID NFATV_DISPLAY_THING_TYPE = new ThingTypeUID(BINDING_ID, NFATV_DISPLAY_THING);
+    public static final String TV_OVERLAY_DISPLAY_THING = "tvoverlaydisplay";
+    public static final ThingTypeUID TV_OVERLAY_DISPLAY_THING_TYPE = new ThingTypeUID(BINDING_ID,
+            TV_OVERLAY_DISPLAY_THING);
+
+    public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES = new HashSet<ThingTypeUID>(
+            Arrays.asList(NFATV_DISPLAY_THING_TYPE, TV_OVERLAY_DISPLAY_THING_TYPE));
 
     // List of all Channel ids
-    public static final String CHANNEL_1 = "channel1";
+    public static final String CHANNEL_IN_TITLE = "incommingTitle";
+    public static final String CHANNEL_IN_MESSAGE = "incommingMessage";
 }

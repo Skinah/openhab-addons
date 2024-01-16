@@ -1,20 +1,17 @@
 # AndroidNotifications Binding
 
-_Give some details about what this binding is meant for - a protocol, system, specific device._
+This binding can talk with more then 1 Google Play store app, you only need one of them not both. This binding will try to standardize the way you interact with the apps, so if one app disappears, gets buggy, or add a large cost involved, you can switch to the other with minimal changes to openHAB. The channels are also as close a possible to the Telegram binding, so that any widgets created for the main UI can be shared between these bindings.
 
-_If possible, provide some resources like pictures (only PNG is supported currently), a video, etc. to give an impression of what can be done with this binding._
-_You can place such resources into a `doc` folder next to this README.md._
-
-_Put each sentence in a separate line to improve readability of diffs._
++ TvOverlay (https://play.google.com/store/apps/details?id=com.tabdeveloper.tvoverlay&hl=en_AU&gl=US)
++ Android TV Notifications (https://play.google.com/store/apps/details?id=de.cyberdream.androidtv.notifications.google&hl=en&gl=US)
+ 
 
 ## Supported Things
 
-_Please describe the different supported things / devices including their ThingTypeUID within this section._
-_Which different types are supported, which models were tested etc.?_
-_Note that it is planned to generate some part of this based on the XML files within ```src/main/resources/OH-INF/thing``` of your binding._
+- `nfatvdisplay`: Android TV Notifications, add one for each TV that is setup and working with this app.
+- `tvoverlaydisplay`: TvOverlay, add one for each TV that is setup and working with this app.
 
-- `bridge`: Short description of the Bridge, if any
-- `sample`: Short description of the Thing with the ThingTypeUID `sample`
+It is possible more things will get added to capture the notifications sent from your phone and other non display devices.
 
 ## Discovery
 
