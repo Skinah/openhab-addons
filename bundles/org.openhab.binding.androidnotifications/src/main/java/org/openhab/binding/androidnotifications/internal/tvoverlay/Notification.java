@@ -12,30 +12,36 @@
  */
 package org.openhab.binding.androidnotifications.internal.tvoverlay;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 /**
- * The {@link Notification} class defines JSON structures that are
- * used across the whole binding.
+ * The {@link Notification} class defines Notification.JSON structure that is used for sending normal type
+ * notifications.
  *
  * @author MatthewSkinner - Initial contribution
  */
+@NonNullByDefault
 public class Notification {
     public int id = 0;
-    public String title = null;
-    public String message = null;
-    public String source = null;
-    public String image = null;
-    public String video = null;
-    public String largeIcon = null;
-    public String smallIcon = null;
-    public String smallIconColor = null;
-    public String corner = null;
-    public int duration = 10;
+    public @Nullable String title;
+    public @Nullable String message;
+    public @Nullable String source = "openHAB";
+    public @Nullable String image;
+    public @Nullable String video;
+    public @Nullable String largeIcon;
+    public @Nullable String smallIcon;
+    public @Nullable String smallIconColor;
+    public @Nullable String corner;
+    public @Nullable Integer duration;
 
     public Notification(int id, @Nullable String title, @Nullable String message) {
         this.id = id;
-        this.title = title;
+        if (title == null) {
+            this.title = ""; // workaround otherwise the API copies the message to the title
+        } else {
+            this.title = title;
+        }
         this.message = message;
     }
 
@@ -45,9 +51,5 @@ public class Notification {
 
     public void setImage(String url) {
         image = url;
-    }
-
-    public void setDuration(int seconds) {
-        duration = seconds;
     }
 }

@@ -12,7 +12,7 @@
  */
 package org.openhab.binding.androidnotifications.internal.tvoverlay;
 
-import static org.openhab.binding.androidnotifications.internal.AndroidNotificationsBindingConstants.HTTP_TIMEOUT_SECONDS;
+import static org.openhab.binding.androidnotifications.internal.AndroidNotificationsBindingConstants.*;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -28,12 +28,18 @@ import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.client.util.StringContentProvider;
 import org.eclipse.jetty.http.HttpMethod;
 import org.openhab.binding.androidnotifications.internal.action.AndroidNotificationActions;
+import org.openhab.core.library.types.OnOffType;
+import org.openhab.core.library.types.PercentType;
+import org.openhab.core.library.types.QuantityType;
+import org.openhab.core.library.types.StringType;
+import org.openhab.core.library.unit.Units;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingStatus;
 import org.openhab.core.thing.binding.BaseThingHandler;
 import org.openhab.core.thing.binding.ThingHandlerService;
 import org.openhab.core.types.Command;
+import org.openhab.core.types.RefreshType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +78,74 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
 
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
+        if (!(command instanceof RefreshType)) {
+            switch (channelUID.getId()) {
+                case CHANNEL_DISPLAY_CORNER:
+                    if (command instanceof StringType) {
+                        Overlay overlay = new Overlay();
+                        overlay.hotCorner = command.toString();
+                        sendPostRequest("/set/overlay", toJson(overlay));
+                    }
+                    break;
+                case CHANNEL_DISPLAY_FIXED_NOTIFICATIONS:
+                    if (command instanceof OnOffType) {
+                        NotificationSettings notificationSettings = new NotificationSettings();
+                        notificationSettings.displayFixedNotifications = command == OnOffType.ON;
+                        sendPostRequest("/set/notifications", toJson(notificationSettings));
+                    }
+                    break;
+                case CHANNEL_OVERLAY_VISIBILITY:
+                    if (command instanceof PercentType percentCommand) {
+                        Overlay overlay = new Overlay();
+                        overlay.overlayVisibility = percentCommand.intValue();
+                        if (overlay.overlayVisibility > 95) {
+                            overlay.overlayVisibility = 95;
+                        }
+                        sendPostRequest("/set/overlay", toJson(overlay));
+                    }
+                    break;
+                case CHANNEL_CLOCK_VISABILITY:
+                    if (command instanceof PercentType percentCommand) {
+                        Overlay overlay = new Overlay();
+                        overlay.clockOverlayVisibility = percentCommand.intValue();
+                        if (overlay.clockOverlayVisibility > 95) {
+                            overlay.clockOverlayVisibility = 95;
+                        }
+                        sendPostRequest("/set/overlay", toJson(overlay));
+                    }
+                    break;
+                case CHANNEL_FIXED_NOTIFICATIONS_VISIBILITY:
+                    if (command instanceof PercentType percentCommand) {
+                        NotificationSettings notificationSettings = new NotificationSettings();
+                        notificationSettings.fixedNotificationsVisibility = percentCommand.intValue();
+                        if (notificationSettings.fixedNotificationsVisibility > 95) {
+                            notificationSettings.fixedNotificationsVisibility = 95;
+                        }
+                        sendPostRequest("/set/notifications", toJson(notificationSettings));
+                    }
+                    break;
+                case CHANNEL_NOTIFICATION_DURATION:
+                    if (!(command instanceof QuantityType<?>)) {
+                        logger.warn("Ignoring non-QuantityType command for duration.");
+                        return;
+                    }
+                    QuantityType<?> quantity = (QuantityType<?>) command;
+                    quantity = quantity.toUnit(Units.SECOND);
+                    if (quantity != null) {
+                        NotificationSettings notificationSettings = new NotificationSettings();
+                        notificationSettings.notificationDuration = quantity.intValue();
+                        sendPostRequest("/set/notifications", toJson(notificationSettings));
+                    }
+                    break;
+                case CHANNEL_DISPLAY_NOTIFICATIONS:
+                    if (command instanceof OnOffType) {
+                        NotificationSettings notificationSettings = new NotificationSettings();
+                        notificationSettings.displayNotifications = command == OnOffType.ON;
+                        sendPostRequest("/set/notifications", toJson(notificationSettings));
+                    }
+                    break;
+            }
+        }
     }
 
     @Override
@@ -140,25 +214,62 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
         return errorReason;
     }
 
-    private String toJson(Notification notification) {
+    private String toJson(Object object) {
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        return gson.toJson(notification);
+        return gson.toJson(object);
     }
 
-    public void sendText(@Nullable String title, String message) {
-        Notification notification = new Notification(0, title, message);
+    public void sendText(int messageID, @Nullable String title, @Nullable String message, @Nullable String largeIcon,
+            @Nullable String smallIcon, @Nullable String smallIconColor, @Nullable String corner,
+            @Nullable Integer duration) {
+        Notification notification = new Notification(messageID, title, message);
+        notification.corner = corner;
+        notification.duration = duration;
+        notification.largeIcon = largeIcon;
+        notification.smallIcon = smallIcon;
+        notification.smallIconColor = smallIconColor;
         sendPostRequest("/notify", toJson(notification));
     }
 
-    public void sendVideo(String videoURL, @Nullable String title, @Nullable String message) {
-        Notification notification = new Notification(1, title, message);
+    public void sendVideo(int messageID, @Nullable String title, @Nullable String message, String videoURL,
+            @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor,
+            @Nullable String corner, @Nullable Integer duration) {
+        Notification notification = new Notification(messageID, title, message);
         notification.setVideo(videoURL);
+        notification.corner = corner;
+        notification.duration = duration;
+        if (largeIcon == null) {
+            notification.largeIcon = "mdi:motion-sensor";
+        } else {
+            notification.largeIcon = largeIcon;
+        }
+        if (smallIcon == null) {
+            notification.smallIcon = "mdi:cctv";
+        } else {
+            notification.smallIcon = smallIcon;
+        }
+        notification.smallIconColor = smallIconColor;
         sendPostRequest("/notify", toJson(notification));
     }
 
-    public void sendImage(String imageURL, @Nullable String title, @Nullable String message) {
-        Notification notification = new Notification(2, title, message);
+    public void sendImage(int messageID, @Nullable String title, @Nullable String message, String imageURL,
+            @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor,
+            @Nullable String corner, @Nullable Integer duration) {
+        Notification notification = new Notification(messageID, title, message);
         notification.setImage(imageURL);
+        notification.corner = corner;
+        notification.duration = duration;
+        if (largeIcon == null) {
+            notification.largeIcon = "mdi:image-album";
+        } else {
+            notification.largeIcon = largeIcon;
+        }
+        if (smallIcon == null) {
+            notification.smallIcon = "mdi:camera";
+        } else {
+            notification.smallIcon = smallIcon;
+        }
+        notification.smallIconColor = smallIconColor;
         sendPostRequest("/notify", toJson(notification));
     }
 }

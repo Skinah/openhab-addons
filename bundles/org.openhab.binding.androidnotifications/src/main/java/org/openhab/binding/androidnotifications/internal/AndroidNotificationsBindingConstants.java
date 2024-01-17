@@ -42,6 +42,11 @@ public class AndroidNotificationsBindingConstants {
             Arrays.asList(NFATV_DISPLAY_THING_TYPE, TV_OVERLAY_DISPLAY_THING_TYPE));
 
     // List of all Channel ids
-    public static final String CHANNEL_IN_TITLE = "incommingTitle";
-    public static final String CHANNEL_IN_MESSAGE = "incommingMessage";
+    public static final String CHANNEL_DISPLAY_FIXED_NOTIFICATIONS = "displayFixedNotifications";
+    public static final String CHANNEL_FIXED_NOTIFICATIONS_VISIBILITY = "fixedNotificationsVisibility";
+    public static final String CHANNEL_OVERLAY_VISIBILITY = "overlayVisibility";
+    public static final String CHANNEL_CLOCK_VISABILITY = "clockOverlayVisibility";
+    public static final String CHANNEL_DISPLAY_CORNER = "hotCorner";
+    public static final String CHANNEL_NOTIFICATION_DURATION = "notificationDuration";
+    public static final String CHANNEL_DISPLAY_NOTIFICATIONS = "displayNotifications";
 }

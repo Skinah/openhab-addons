@@ -10,12 +10,7 @@
 			your TV's that have this app installed and setup correctly.</description>
 
 		<channels>
-			<channel id="lastMessageText" typeId="lastMessageText"/>
-			<channel id="lastMessageURL" typeId="lastMessageURL"/>
-			<channel id="lastMessageDate" typeId="lastMessageDate"/>
-			<channel id="lastMessageName" typeId="lastMessageName"/>
-			<channel id="lastMessageUsername" typeId="lastMessageUsername"/>
-			<channel id="chatId" typeId="chatId"/>
+			<channel id="displayNotifications" typeId="displayNotifications"/>
 		</channels>
 
 		<config-description>
@@ -40,12 +35,13 @@
 			correctly setup and working app.</description>
 
 		<channels>
-			<channel id="lastMessageText" typeId="lastMessageText"/>
-			<channel id="lastMessageURL" typeId="lastMessageURL"/>
-			<channel id="lastMessageDate" typeId="lastMessageDate"/>
-			<channel id="lastMessageName" typeId="lastMessageName"/>
-			<channel id="lastMessageUsername" typeId="lastMessageUsername"/>
-			<channel id="chatId" typeId="chatId"/>
+			<channel id="displayFixedNotifications" typeId="displayFixedNotifications"/>
+			<channel id="fixedNotificationsVisibility" typeId="fixedNotificationsVisibility"/>
+			<channel id="overlayVisibility" typeId="overlayVisibility"/>
+			<channel id="clockOverlayVisibility" typeId="clockOverlayVisibility"/>
+			<channel id="hotCorner" typeId="hotCorner"/>
+			<channel id="notificationDuration" typeId="notificationDuration"/>
+			<channel id="displayNotifications" typeId="displayNotifications"/>
 		</channels>
 
 		<config-description>
@@ -64,45 +60,84 @@
 		</config-description>
 	</thing-type>
 
-	<channel-type id="lastMessageText">
-		<item-type>String</item-type>
-		<label>Last Message Text</label>
-		<description>Contains the latest message text as a string</description>
-		<state readOnly="true"/>
+	<channel-type id="fixedNotificationsVisibility">
+		<item-type>Dimmer</item-type>
+		<label>Fixed Notifications Visibility</label>
+		<description>Change how transparent the fixed notifications are on the screen</description>
 	</channel-type>
 
-	<channel-type id="lastMessageURL">
-		<item-type>String</item-type>
-		<label>Last Message URL</label>
-		<description>Contains the URL of the latest message</description>
-		<state readOnly="true"/>
+	<channel-type id="overlayVisibility">
+		<item-type>Dimmer</item-type>
+		<label>Overlay Visibility</label>
+		<description>Change how transparent or dark the entire screen is through the use of a full screen black background</description>
+	</channel-type>
+	<channel-type id="clockOverlayVisibility">
+		<item-type>Dimmer</item-type>
+		<label>Clock Overlay Visibility</label>
+		<description>Change how transparent the clock is on the screen</description>
 	</channel-type>
 
-	<channel-type id="lastMessageDate">
-		<item-type>DateTime</item-type>
-		<label>Last Message Date</label>
-		<description>Contains the latest message date as a DateTime</description>
-		<state readOnly="true"/>
+	<channel-type id="hotCorner">
+		<item-type>String</item-type>
+		<label>Hot Corner</label>
+		<description>The corner used to display new messages in</description>
+		<state readOnly="false">
+			<options>
+				<option value="top_start">top_start</option>
+				<option value="top_end">top_end</option>
+				<option value="bottom_start">bottom_start</option>
+				<option value="bottom_end">bottom_end</option>
+			</options>
+		</state>
 	</channel-type>
 
-	<channel-type id="lastMessageName">
-		<item-type>String</item-type>
-		<label>Last Message Name</label>
-		<description>Contains the latest message senders name as a string</description>
-		<state readOnly="true"/>
+
+	<channel-type id="notificationDuration">
+		<item-type>Number:Time</item-type>
+		<label>Notification Duration</label>
+		<description>The duration the station will be opened the next time it is switched on.</description>
+		<category>Time</category>
+		<state>
+			<options>
+				<option value="2s">2 Seconds</option>
+				<option value="5s">5 Seconds</option>
+				<option value="10s">10 Seconds</option>
+				<option value="15s">15 Seconds</option>
+				<option value="20s">20 Seconds</option>
+				<option value="25s">25 Seconds</option>
+				<option value="30s">30 Seconds</option>
+				<option value="45s">45 Seconds</option>
+				<option value="1min">1 Minute</option>
+				<option value="5min">5 Minutes</option>
+				<option value="10min">10 Minutes</option>
+				<option value="15min">15 Minutes</option>
+				<option value="20min">20 Minutes</option>
+				<option value="25min">25 Minutes</option>
+				<option value="30min">30 Minutes</option>
+				<option value="40min">40 Minutes</option>
+				<option value="50min">50 Minutes</option>
+				<option value="60min">1 Hour</option>
+				<option value="90min">1.5 Hours</option>
+			</options>
+		</state>
 	</channel-type>
 
-	<channel-type id="lastMessageUsername">
-		<item-type>String</item-type>
-		<label>Last Message Username</label>
-		<description>Contains the latest message senders username as a string</description>
-		<state readOnly="true"/>
+	<channel-type id="displayFixedNotifications">
+		<item-type>Switch</item-type>
+		<label>Display Fixed Notifications</label>
+		<description>Whether or not the fixed notifications are displayed.</description>
 	</channel-type>
 
-	<channel-type id="chatId">
-		<item-type>String</item-type>
-		<label>Chat Id</label>
-		<description>Contains the id of chat from where the message was received.</description>
-		<state readOnly="true"/>
+	<channel-type id="displayNotifications">
+		<item-type>Switch</item-type>
+		<label>Display Notifications</label>
+		<description>Whether or not the notifications are displayed.</description>
 	</channel-type>
+
+	<channel-type id="backgroundColor" advanced="true">
+		<item-type>Color</item-type>
+		<label>Background Color</label>
+		<description>Allows you to change the background color for fixed notifications</description>
+	</channel-type>
+
 </thing:thing-descriptions>

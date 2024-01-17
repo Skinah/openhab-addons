@@ -39,29 +39,68 @@ public class AndroidNotificationActions implements ThingActions {
     private @Nullable TvOverlayDisplayHandler tvOverlayDisplayHandler = null;
     private @Nullable AndroidTvNotificationsDisplayHandler androidTvNotificationsDisplayHandler = null;
 
-    public static boolean sendImage(@Nullable ThingActions actions, String imageURL, @Nullable String title,
-            @Nullable String message) {
+    public static boolean sendImage(@Nullable ThingActions actions, int messageID, @Nullable String title,
+            @Nullable String message, String imageURL, @Nullable String largeIcon, @Nullable String smallIcon,
+            @Nullable String smallIconColor, @Nullable String corner, @Nullable Integer duration) {
         if (actions instanceof AndroidNotificationActions) {
-            ((AndroidNotificationActions) actions).sendImage(imageURL, title, message);
+            ((AndroidNotificationActions) actions).sendImage(messageID, title, message, imageURL, largeIcon, smallIcon,
+                    smallIconColor, corner, duration);
             return true;
         } else {
             throw new IllegalArgumentException("Instance is not an AndroidNotificationActions class.");
         }
     }
 
-    public static boolean sendText(@Nullable ThingActions actions, @Nullable String title, String message) {
+    public static boolean sendImage(@Nullable ThingActions actions, int messageID, @Nullable String title,
+            @Nullable String message, String imageURL) {
         if (actions instanceof AndroidNotificationActions) {
-            ((AndroidNotificationActions) actions).sendText(title, message);
+            ((AndroidNotificationActions) actions).sendImage(messageID, title, message, imageURL, null, null, null,
+                    null, null);
             return true;
         } else {
             throw new IllegalArgumentException("Instance is not an AndroidNotificationActions class.");
         }
     }
 
-    public static boolean sendVideo(@Nullable ThingActions actions, String videoURL, @Nullable String title,
-            @Nullable String message) {
+    public static boolean sendText(@Nullable ThingActions actions, int messageID, @Nullable String title,
+            String message, @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor,
+            @Nullable String corner, @Nullable Integer duration) {
         if (actions instanceof AndroidNotificationActions) {
-            ((AndroidNotificationActions) actions).sendVideo(videoURL, title, message);
+            ((AndroidNotificationActions) actions).sendText(messageID, title, message, largeIcon, smallIcon,
+                    smallIconColor, corner, duration);
+            return true;
+        } else {
+            throw new IllegalArgumentException("Instance is not an AndroidNotificationActions class.");
+        }
+    }
+
+    public static boolean sendText(@Nullable ThingActions actions, int messageID, @Nullable String title,
+            String message) {
+        if (actions instanceof AndroidNotificationActions) {
+            ((AndroidNotificationActions) actions).sendText(messageID, title, message, null, null, null, null, null);
+            return true;
+        } else {
+            throw new IllegalArgumentException("Instance is not an AndroidNotificationActions class.");
+        }
+    }
+
+    public static boolean sendVideo(@Nullable ThingActions actions, int messageID, @Nullable String title,
+            @Nullable String message, String videoURL, @Nullable String largeIcon, @Nullable String smallIcon,
+            @Nullable String smallIconColor, @Nullable String corner, @Nullable Integer duration) {
+        if (actions instanceof AndroidNotificationActions) {
+            ((AndroidNotificationActions) actions).sendVideo(messageID, title, message, videoURL, largeIcon, smallIcon,
+                    smallIconColor, corner, duration);
+            return true;
+        } else {
+            throw new IllegalArgumentException("Instance is not an AndroidNotificationActions class.");
+        }
+    }
+
+    public static boolean sendVideo(@Nullable ThingActions actions, int messageID, @Nullable String title,
+            @Nullable String message, String videoURL) {
+        if (actions instanceof AndroidNotificationActions) {
+            ((AndroidNotificationActions) actions).sendVideo(messageID, title, message, videoURL, null, null, null,
+                    null, null);
             return true;
         } else {
             throw new IllegalArgumentException("Instance is not an AndroidNotificationActions class.");
@@ -69,35 +108,52 @@ public class AndroidNotificationActions implements ThingActions {
     }
 
     @RuleAction(label = "@text/actionSendImageLabel", description = "@text/actionSendImageDesc")
-    public boolean sendImage(@ActionInput(name = "imageURL") String imageURL,
+    public boolean sendImage(@ActionInput(name = "messageID") int messageID,
             @ActionInput(name = "title") @Nullable String title,
-            @ActionInput(name = "message") @Nullable String message) {
+            @ActionInput(name = "message") @Nullable String message, @ActionInput(name = "imageURL") String imageURL,
+            @ActionInput(name = "largeIcon") @Nullable String largeIcon,
+            @ActionInput(name = "smallIcon") @Nullable String smallIcon,
+            @ActionInput(name = "smallIconColor") @Nullable String smallIconColor,
+            @ActionInput(name = "corner") @Nullable String corner,
+            @ActionInput(name = "duration") @Nullable Integer duration) {
         TvOverlayDisplayHandler localHandler = tvOverlayDisplayHandler;
         if (localHandler != null) {
-            localHandler.sendImage(imageURL, title, message);
+            localHandler.sendImage(messageID, title, message, imageURL, largeIcon, smallIcon, smallIconColor, corner,
+                    duration);
             return true;
         }
         return false;
     }
 
     @RuleAction(label = "@text/actionSendTextLabel", description = "@text/actionSendTextDesc")
-    public boolean sendText(@ActionInput(name = "title") @Nullable String title,
-            @ActionInput(name = "message") String message) {
+    public boolean sendText(@ActionInput(name = "messageID") int messageID,
+            @ActionInput(name = "title") @Nullable String title, @ActionInput(name = "message") String message,
+            @ActionInput(name = "largeIcon") @Nullable String largeIcon,
+            @ActionInput(name = "smallIcon") @Nullable String smallIcon,
+            @ActionInput(name = "smallIconColor") @Nullable String smallIconColor,
+            @ActionInput(name = "corner") @Nullable String corner,
+            @ActionInput(name = "duration") @Nullable Integer duration) {
         TvOverlayDisplayHandler localHandler = tvOverlayDisplayHandler;
         if (localHandler != null) {
-            localHandler.sendText(title, message);
+            localHandler.sendText(messageID, title, message, largeIcon, smallIcon, smallIconColor, corner, duration);
             return true;
         }
         return false;
     }
 
     @RuleAction(label = "@text/actionSendVideoLabel", description = "@text/actionSendVideoDesc")
-    public boolean sendVideo(@ActionInput(name = "videoURL") String videoURL,
+    public boolean sendVideo(@ActionInput(name = "messageID") int messageID,
             @ActionInput(name = "title") @Nullable String title,
-            @ActionInput(name = "message") @Nullable String message) {
+            @ActionInput(name = "message") @Nullable String message, @ActionInput(name = "videoURL") String videoURL,
+            @ActionInput(name = "largeIcon") @Nullable String largeIcon,
+            @ActionInput(name = "smallIcon") @Nullable String smallIcon,
+            @ActionInput(name = "smallIconColor") @Nullable String smallIconColor,
+            @ActionInput(name = "corner") @Nullable String corner,
+            @ActionInput(name = "duration") @Nullable Integer duration) {
         TvOverlayDisplayHandler localHandler = tvOverlayDisplayHandler;
         if (localHandler != null) {
-            localHandler.sendVideo(videoURL, title, message);
+            localHandler.sendVideo(messageID, title, message, videoURL, largeIcon, smallIcon, smallIconColor, corner,
+                    duration);
             return true;
         }
         return false;
