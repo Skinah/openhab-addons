@@ -10,7 +10,7 @@
 			your TV's that have this app installed and setup correctly.</description>
 
 		<channels>
-			<channel id="displayNotifications" typeId="displayNotifications"/>
+			<channel id="sendNotification" typeId="sendNotification"/>
 		</channels>
 
 		<config-description>
@@ -35,6 +35,7 @@
 			correctly setup and working app.</description>
 
 		<channels>
+			<channel id="sendNotification" typeId="sendNotification"/>
 			<channel id="displayFixedNotifications" typeId="displayFixedNotifications"/>
 			<channel id="fixedNotificationsVisibility" typeId="fixedNotificationsVisibility"/>
 			<channel id="overlayVisibility" typeId="overlayVisibility"/>
@@ -138,6 +139,12 @@
 		<item-type>Color</item-type>
 		<label>Background Color</label>
 		<description>Allows you to change the background color for fixed notifications</description>
+	</channel-type>
+
+	<channel-type id="sendNotification">
+		<item-type>Switch</item-type>
+		<label>Display a Test Notification</label>
+		<description>Use this channel to test if the binding is talking to the app sucessfully.</description>
 	</channel-type>
 
 </thing:thing-descriptions>

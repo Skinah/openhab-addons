@@ -4,10 +4,12 @@ This binding can talk with more then 1 Google Play store app, you only need one 
 This binding will try to standardize the way you interact with the apps, so if one app disappears, gets buggy, or adds a large cost involved, you can switch to the other with minimal changes to openHAB.
 
 The two supported apps so far are:
+
 + TvOverlay <https://play.google.com/store/apps/details?id=com.tabdeveloper.tvoverlay&hl=en_AU&gl=US>
 + Android TV Notifications <https://play.google.com/store/apps/details?id=de.cyberdream.androidtv.notifications.google&hl=en&gl=US>
 
 Other apps which are not support but could be are:
+
 + Push TV <https://play.google.com/store/apps/details?id=de.andreashuth.pushtv>
 
 Please refer to the github pages for help on how to setup the apps and TV settings needed.

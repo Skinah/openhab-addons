@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2023 Contributors to the openHAB project
+ * Copyright (c) 2010-2024 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -142,6 +142,16 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
                         NotificationSettings notificationSettings = new NotificationSettings();
                         notificationSettings.displayNotifications = command == OnOffType.ON;
                         sendPostRequest("/set/notifications", toJson(notificationSettings));
+                    }
+                    break;
+                case CHANNEL_SEND_NOTIFICATION:
+                    if (command instanceof OnOffType) {
+                        sendText(9999, "openHAB: Empowering the smart home",
+                                "Congratulations you have a working test message", "mdi:chevron-up-circle-outline",
+                                null, null, null, null);
+                    } else if (command instanceof StringType) {
+                        sendText(9999, command.toString(), null, "mdi:chevron-up-circle-outline", null, null, null,
+                                null);
                     }
                     break;
             }
