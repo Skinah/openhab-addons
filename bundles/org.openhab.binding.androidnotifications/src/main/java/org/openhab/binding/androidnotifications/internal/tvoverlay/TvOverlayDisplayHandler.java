@@ -144,14 +144,16 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
                         sendPostRequest("/set/notifications", toJson(notificationSettings));
                     }
                     break;
-                case CHANNEL_SEND_NOTIFICATION:
+                case CHANNEL_SEND_TEST_NOTIFICATION:
                     if (command instanceof OnOffType) {
-                        sendText(9999, "openHAB: Empowering the smart home",
-                                "Congratulations you have a working test message", "mdi:chevron-up-circle-outline",
-                                null, null, null, null);
-                    } else if (command instanceof StringType) {
-                        sendText(9999, command.toString(), null, "mdi:chevron-up-circle-outline", null, null, null,
-                                null);
+                        sendText(9999, "Empowering the smart home", "Congratulations you have a working test message",
+                                "mdi:home-alert-outline", "mdi:chevron-up-circle-outline", "#f47d2e", null, null);
+                    }
+                    break;
+                case CHANNEL_SEND_NOTIFICATION:
+                    if (command instanceof StringType) {
+                        sendText(9999, command.toString(), null, "mdi:home-alert-outline",
+                                "mdi:chevron-up-circle-outline", "#f47d2e", null, null);
                     }
                     break;
             }

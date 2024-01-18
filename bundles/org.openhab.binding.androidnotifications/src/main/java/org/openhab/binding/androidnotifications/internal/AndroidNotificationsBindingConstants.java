@@ -28,7 +28,7 @@ import org.openhab.core.thing.ThingTypeUID;
 @NonNullByDefault
 public class AndroidNotificationsBindingConstants {
 
-    private static final String BINDING_ID = "androidnotifications";
+    public static final String BINDING_ID = "androidnotifications";
     public static final int HTTP_TIMEOUT_SECONDS = 10;
 
     // List of all Things and Thing Types
@@ -41,6 +41,9 @@ public class AndroidNotificationsBindingConstants {
     public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES = new HashSet<ThingTypeUID>(
             Arrays.asList(NFATV_DISPLAY_THING_TYPE, TV_OVERLAY_DISPLAY_THING_TYPE));
 
+    // Configs
+    public static final String CONFIG_ADDRESS = "address";
+
     // List of all Channel ids
     public static final String CHANNEL_DISPLAY_FIXED_NOTIFICATIONS = "displayFixedNotifications";
     public static final String CHANNEL_FIXED_NOTIFICATIONS_VISIBILITY = "fixedNotificationsVisibility";
@@ -50,4 +53,5 @@ public class AndroidNotificationsBindingConstants {
     public static final String CHANNEL_NOTIFICATION_DURATION = "notificationDuration";
     public static final String CHANNEL_DISPLAY_NOTIFICATIONS = "displayNotifications";
     public static final String CHANNEL_SEND_NOTIFICATION = "sendNotification";
+    public static final String CHANNEL_SEND_TEST_NOTIFICATION = "sendTestNotification";
 }

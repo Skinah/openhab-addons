@@ -12,8 +12,10 @@
  */
 package org.openhab.binding.androidnotifications.internal;
 
-import static org.openhab.binding.androidnotifications.internal.AndroidNotificationsBindingConstants.SUPPORTED_THING_TYPES;
+import static org.openhab.binding.androidnotifications.internal.AndroidNotificationsBindingConstants.*;
 
+import java.net.InetAddress;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -29,8 +31,10 @@ import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpMethod;
 import org.openhab.core.config.discovery.DiscoveryResult;
+import org.openhab.core.config.discovery.DiscoveryResultBuilder;
 import org.openhab.core.config.discovery.mdns.MDNSDiscoveryParticipant;
 import org.openhab.core.io.net.http.HttpClientFactory;
+import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingTypeUID;
 import org.openhab.core.thing.ThingUID;
 import org.osgi.service.component.annotations.Activate;
@@ -46,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * @author Matthew Skinner - Initial contribution
  */
 @NonNullByDefault
-@Component(service = MDNSDiscoveryParticipant.class)
+@Component(service = MDNSDiscoveryParticipant.class, immediate = true, configurationPid = "discovery.googletv")
 public class AndroidNotificationsDiscoveryService implements MDNSDiscoveryParticipant {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final HttpClient httpClient;
@@ -56,25 +60,24 @@ public class AndroidNotificationsDiscoveryService implements MDNSDiscoveryPartic
         this.httpClient = httpClientFactory.getCommonHttpClient();
     }
 
-    private String sendGetRequest(String address, String url) {
-        Request request = httpClient.newRequest(address + url);
-        request.timeout(3, TimeUnit.SECONDS);
-        request.method(HttpMethod.GET);
-        request.header(HttpHeader.ACCEPT_ENCODING, "gzip");
-        logger.trace("Sending WLED GET:{}", url);
+    private boolean sendGetRequest(String fullURL) {
         try {
+            Request request = httpClient.newRequest(fullURL);
+            request.timeout(5, TimeUnit.SECONDS);
+            request.method(HttpMethod.GET);
+            request.header(HttpHeader.ACCEPT_ENCODING, "gzip");
+            logger.trace("Sending possible TV GET:{}", fullURL);
             ContentResponse contentResponse = request.send();
             if (contentResponse.getStatus() == 200) {
-                return contentResponse.getContentAsString();
+                return true;
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-        } catch (TimeoutException | ExecutionException e) {
-            logger.debug(
-                    "WLED discovery hit a TimeoutException | ExecutionException which may have blocked a device from getting discovered:{}",
+        } catch (TimeoutException | IllegalArgumentException | ExecutionException e) {
+            logger.debug("Discovery hit an Exception which may have blocked a device from getting discovered:{}",
                     e.getMessage());
         }
-        return "";
+        return false;
     }
 
     @Override
@@ -84,35 +87,41 @@ public class AndroidNotificationsDiscoveryService implements MDNSDiscoveryPartic
 
     @Override
     public String getServiceType() {
-        return "_http._tcp.local.";
+        return "TV._androidtvremote2._tcp.local.";
     }
 
     @Override
     public @Nullable DiscoveryResult createResult(ServiceInfo service) {
-        String name = service.getName().toLowerCase();
-        logger.info("mDNS discovered {}", name);
-        if (!name.contains("wled")) {
+        if (!service.hasData()) {
             return null;
         }
-        String[] address = service.getURLs();
-        if ((address == null) || address.length < 1) {
-            logger.debug("WLED discovered with empty IP address-{}", service);
+        String name = service.getName().replaceAll("\\s+", "");
+        String macAddress = service.getPropertyString("bt");
+        String address;
+        InetAddress[] ipAddresses = service.getInet4Addresses();
+        if (ipAddresses.length > 0) {
+            address = ipAddresses[0].getHostAddress();
+        } else {
             return null;
         }
-        // String response = sendGetRequest(address[0], "/json");
-        // String label = WLedHelper.getValue(response, "\"name\":\"", "\"");
-        // if (label.isEmpty()) {
-        // label = "WLED @ " + address[0];
-        // }
-        // String macAddress = WLedHelper.getValue(response, "\"mac\":\"", "\"");
-        // if (!macAddress.isBlank()) {
-        // String firmware = WLedHelper.getValue(response, "\"ver\":\"", "\"");
-        // ThingUID thingUID = new ThingUID(THING_TYPE_JSON, macAddress);
-        // Map<String, Object> properties = Map.of(Thing.PROPERTY_MAC_ADDRESS, macAddress,
-        // Thing.PROPERTY_FIRMWARE_VERSION, firmware, CONFIG_ADDRESS, address[0]);
-        // return DiscoveryResultBuilder.create(thingUID).withLabel(label).withProperties(properties)
-        // .withRepresentationProperty(Thing.PROPERTY_MAC_ADDRESS).build();
-        // }
+        if (logger.isDebugEnabled()) {
+            logger.debug("mDNS service nice name: {}", service.getNiceTextString());
+            logger.debug("mDNS address: {}", address);
+            logger.debug("mDNS macAddress: {}", macAddress);
+            logger.debug("mDNS name `{}`", name);
+        }
+        if (sendGetRequest("http://" + address + ":5001/notifications")) {
+            ThingUID thingUID = new ThingUID(TV_OVERLAY_DISPLAY_THING_TYPE, name);
+            Map<String, Object> properties = Map.of(Thing.PROPERTY_MAC_ADDRESS, macAddress, CONFIG_ADDRESS, address);
+            return DiscoveryResultBuilder.create(thingUID).withLabel(name + " running TvOverlay")
+                    .withProperties(properties).withRepresentationProperty(Thing.PROPERTY_MAC_ADDRESS).build();
+        }
+        if (sendGetRequest("http://" + address + ":7676/")) {
+            ThingUID thingUID = new ThingUID(NFATV_DISPLAY_THING_TYPE, name);
+            Map<String, Object> properties = Map.of(Thing.PROPERTY_MAC_ADDRESS, macAddress, CONFIG_ADDRESS, address);
+            return DiscoveryResultBuilder.create(thingUID).withLabel(name + " running TvOverlay")
+                    .withProperties(properties).withRepresentationProperty(Thing.PROPERTY_MAC_ADDRESS).build();
+        }
         return null;
     }
 

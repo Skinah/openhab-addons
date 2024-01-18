@@ -36,6 +36,7 @@
 
 		<channels>
 			<channel id="sendNotification" typeId="sendNotification"/>
+			<channel id="sendTestNotification" typeId="sendTestNotification"/>
 			<channel id="displayFixedNotifications" typeId="displayFixedNotifications"/>
 			<channel id="fixedNotificationsVisibility" typeId="fixedNotificationsVisibility"/>
 			<channel id="overlayVisibility" typeId="overlayVisibility"/>
@@ -141,10 +142,17 @@
 		<description>Allows you to change the background color for fixed notifications</description>
 	</channel-type>
 
-	<channel-type id="sendNotification">
+	<channel-type id="sendTestNotification">
 		<item-type>Switch</item-type>
-		<label>Display a Test Notification</label>
-		<description>Use this channel to test if the binding is talking to the app sucessfully.</description>
+		<label>Send Test Notification</label>
+		<description>Use this channel to test if the binding is talking to the app successfully.</description>
+	</channel-type>
+
+	<channel-type id="sendNotification">
+		<item-type>String</item-type>
+		<label>Send Notification</label>
+		<description>Use this channel to send quick messages using an input by changing the `default list item widget` to
+			`oh-input-item`</description>
 	</channel-type>
 
 </thing:thing-descriptions>
