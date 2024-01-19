@@ -87,7 +87,7 @@ public class AndroidNotificationsDiscoveryService implements MDNSDiscoveryPartic
 
     @Override
     public String getServiceType() {
-        return "TV._androidtvremote2._tcp.local.";
+        return "._androidtvremote2._tcp.local.";
     }
 
     @Override

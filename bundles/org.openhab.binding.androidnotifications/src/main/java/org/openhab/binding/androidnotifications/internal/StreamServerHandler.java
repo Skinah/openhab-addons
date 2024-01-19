@@ -87,23 +87,22 @@ public class StreamServerHandler extends ChannelInboundHandlerAdapter {
         try {
             if (msg instanceof HttpRequest) {
                 HttpRequest httpRequest = (HttpRequest) msg;
-                // logger.info("Stream Server recieved request {}:{}", httpRequest.method(), httpRequest.uri());
 
                 if ("GET".equalsIgnoreCase(httpRequest.method().toString())) {
                     // Some browsers send a query string after the path when refreshing a picture.
                     QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httpRequest.uri());
                     switch (httpRequest.uri()) {
                         case "/available":
-                            logger.debug("/available:{}", handler.sendGetRequest("/available"));
-                            sendOk(ctx);
+                            // logger.debug("From binding to TV/available:{}", handler.sendGetRequest("/available"));
+                            // sendOk(ctx);
                             break;
                         case "/id":
-                            logger.debug("/id:{}", handler.sendGetRequest("/id"));
-                            sendEmptyOk(ctx);
+                            // logger.debug("From binding to TV/id:{}", handler.sendGetRequest("/id"));
+                            // sendEmptyOk(ctx);
                             // handler.sendPostMultipartRequest();
                             break;
                         default:
-                            logger.trace("Stream Server recieved request {}:{}", httpRequest.method(),
+                            logger.info("Stream Server recieved unknown request {}:{}", httpRequest.method(),
                                     httpRequest.uri());
                     }
 
@@ -133,12 +132,9 @@ public class StreamServerHandler extends ChannelInboundHandlerAdapter {
 
                     handler.sendPostMultipartRequest();
 
-                    // handler.sendJSONPostRequestWithPNG(
-                    // "{'filename': ('icon.png', <_io.BytesIO object at 0xffffacc46360>,
-                    // 'application/octet-stream',{'Expires': '0'}), 'msg': 'It WORKS', 'title': 'Title text',
-                    // 'fontsize': 0, 'bkgcolor':'#4CAF50'}");
-
                     sendOk(ctx);
+                } else {
+                    logger.info("Stream Server recieved unknown request");
                 }
             }
             if (msg instanceof HttpContent) {
@@ -166,7 +162,7 @@ public class StreamServerHandler extends ChannelInboundHandlerAdapter {
             }
         } finally {
             ReferenceCountUtil.release(msg);
-            ctx.close();
+            // ctx.close();
         }
     }
 

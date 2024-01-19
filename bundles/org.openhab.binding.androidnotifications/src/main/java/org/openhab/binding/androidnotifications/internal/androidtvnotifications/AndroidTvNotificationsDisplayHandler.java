@@ -12,7 +12,7 @@
  */
 package org.openhab.binding.androidnotifications.internal.androidtvnotifications;
 
-import static org.openhab.binding.androidnotifications.internal.AndroidNotificationsBindingConstants.HTTP_TIMEOUT_SECONDS;
+import static org.openhab.binding.androidnotifications.internal.AndroidNotificationsBindingConstants.*;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -46,12 +46,15 @@ import org.eclipse.jetty.http.HttpMethod;
 import org.openhab.binding.androidnotifications.internal.StreamServerHandler;
 import org.openhab.binding.androidnotifications.internal.action.AndroidNotificationActions;
 import org.openhab.core.OpenHAB;
+import org.openhab.core.library.types.OnOffType;
+import org.openhab.core.library.types.StringType;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingStatus;
 import org.openhab.core.thing.binding.BaseThingHandler;
 import org.openhab.core.thing.binding.ThingHandlerService;
 import org.openhab.core.types.Command;
+import org.openhab.core.types.RefreshType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -178,7 +181,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
                 + "Content-Disposition: form-data; name=\"title\"; filename=\"title\"\r\n" + "\r\n"
                 + "Home Assistant\r\n" + "--myBoundary--\r\n";
 
-        logger.info("Sending {} bytes to TV. Message:{}", Integer.toString(content.length()), content);
+        logger.trace("Sending {} bytes to TV. Message:{}", Integer.toString(content.length()), content);
         Request request = httpClient.POST(baseUrlAndPort + "/");
         request.timeout(3, TimeUnit.SECONDS);
         request.header("Authorization", "Basic Og==");
@@ -193,7 +196,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
         try {
             ContentResponse contentResponse = request.send();
             if (contentResponse.getStatus() == 200) {
-                logger.info("Response back:{}", contentResponse.getContentAsString());
+                logger.trace("Response back from TV:{}", contentResponse.getContentAsString());
                 return contentResponse.getContentAsString();
             } else {
                 errorReason = String.format("Android Notification request failed with %d: %s",
@@ -206,7 +209,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
         } catch (ExecutionException e) {
             errorReason = String.format("ExecutionException: %s", e.getMessage());
         }
-        logger.info("Returned Message:{}", errorReason);
+        logger.debug("Returned error message from sending to the TV:{}", errorReason);
         return errorReason;
     }
 
@@ -248,7 +251,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
         try {
             ContentResponse contentResponse = request.send();
             if (contentResponse.getStatus() == 200) {
-                logger.info("Response back:{}", contentResponse.getContentAsString());
+                logger.trace("Response back from TV:{}", contentResponse.getContentAsString());
 
                 return contentResponse.getContentAsString();
             } else {
@@ -262,12 +265,12 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
         } catch (ExecutionException e) {
             errorReason = String.format("ExecutionException: %s", e.getMessage());
         }
-        logger.info("Returned Message:{}", errorReason);
+        logger.info("Returned Error Message:{}", errorReason);
         return errorReason;
     }
 
     public String sendPostMultipartRequest(String content) {
-        logger.info("Sending {} bytes to TV. Message:{}", Integer.toString(content.length()), content);
+        logger.trace("Sending {} bytes to TV. Message:{}", Integer.toString(content.length()), content);
         Request request = httpClient.POST(baseUrlAndPort + "/");
         request.timeout(3, TimeUnit.SECONDS);
         request.header("Authorization", "Basic Og==");
@@ -287,7 +290,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
         try {
             ContentResponse contentResponse = request.send();
             if (contentResponse.getStatus() == 200) {
-                logger.info("Response back:{}", contentResponse.getContentAsString());
+                logger.trace("Response back from TV:{}", contentResponse.getContentAsString());
 
                 return contentResponse.getContentAsString();
             } else {
@@ -301,12 +304,12 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
         } catch (ExecutionException e) {
             errorReason = String.format("ExecutionException: %s", e.getMessage());
         }
-        logger.info("Returned Message:{}", errorReason);
+        logger.info("Returned Error Message:{}", errorReason);
         return errorReason;
     }
 
     public String sendPostRequest(String content) {
-        logger.info("Sending {} bytes to TV. Message:{}", Integer.toString(content.length()), content);
+        logger.trace("Sending {} bytes to TV. Message:{}", Integer.toString(content.length()), content);
         Request request = httpClient.POST(baseUrlAndPort + "/");
         request.timeout(3, TimeUnit.SECONDS);
         request.header("Authorization", "Basic Og==");
@@ -321,7 +324,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
         try {
             ContentResponse contentResponse = request.send();
             if (contentResponse.getStatus() == 200) {
-                logger.info("Response back:{}", contentResponse.getContentAsString());
+                logger.trace("Response back from TV:{}", contentResponse.getContentAsString());
                 return contentResponse.getContentAsString();
             } else {
                 errorReason = String.format("Android Notification request failed with %d: %s",
@@ -334,7 +337,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
         } catch (ExecutionException e) {
             errorReason = String.format("ExecutionException: %s", e.getMessage());
         }
-        logger.info("Returned Message:{}", errorReason);
+        logger.info("Returned Error Message:{}", errorReason);
         return errorReason;
     }
 
@@ -352,7 +355,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
     }
 
     public String sendJSONPostRequestWithPNG(String content) {
-        logger.info("Sending {} bytes to TV. Message:{}", Integer.toString(content.length()), content);
+        logger.trace("Sending {} bytes to TV. Message:{}", Integer.toString(content.length()), content);
         Request request = httpClient.POST(baseUrlAndPort + "/");
         request.timeout(3, TimeUnit.SECONDS);
         request.header("Authorization", "Basic Og==");
@@ -375,7 +378,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
         try {
             ContentResponse contentResponse = request.send();
             if (contentResponse.getStatus() == 200) {
-                logger.info("Response back:{}", contentResponse.getContentAsString());
+                logger.trace("Response back from TV:{}", contentResponse.getContentAsString());
                 request.content(new ByteBufferContentProvider(getIconData("qualityofservice-1.png")));
                 request.header(HttpHeader.CONTENT_LENGTH,
                         Integer.toString(getIconData("qualityofservice-1.png").remaining()));
@@ -392,12 +395,12 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
         } catch (ExecutionException e) {
             errorReason = String.format("ExecutionException: %s", e.getMessage());
         }
-        logger.info("Returned Message:{}", errorReason);
+        logger.info("Returned Error Message:{}", errorReason);
         return errorReason;
     }
 
     public String sendJSONPostRequest(String content) {
-        logger.info("Sending {} bytes to TV. Message:{}", Integer.toString(content.length()), content);
+        logger.trace("Sending {} bytes to TV. Message:{}", Integer.toString(content.length()), content);
         Request request = httpClient.POST(baseUrlAndPort + "/");
         request.timeout(3, TimeUnit.SECONDS);
         request.header("Authorization", "Basic Og==");
@@ -412,7 +415,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
         try {
             ContentResponse contentResponse = request.send();
             if (contentResponse.getStatus() == 200) {
-                logger.info("Response back:{}", contentResponse.getContentAsString());
+                logger.trace("Response back from TV:{}", contentResponse.getContentAsString());
                 return contentResponse.getContentAsString();
             } else {
                 errorReason = String.format("Android Notification request failed with %d: %s",
@@ -425,7 +428,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
         } catch (ExecutionException e) {
             errorReason = String.format("ExecutionException: %s", e.getMessage());
         }
-        logger.info("Returned Message:{}", errorReason);
+        logger.info("Returned Error Message:{}", errorReason);
         return errorReason;
     }
 
@@ -451,7 +454,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
 
     @SuppressWarnings("null")
     public void startStreamServer(boolean start) {
-
+        getLocalIpAddress();
         if (!start) {
             serversLoopGroup.shutdownGracefully();
             serverBootstrap = null;
@@ -468,9 +471,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
                             socketChannel.pipeline().addLast("idleStateHandler", new IdleStateHandler(60, 180, 0));
-                            // must be server to allow app to see the fake TV as valid
                             socketChannel.pipeline().addLast("HttpServerCodec", new HttpServerCodec());
-                            // socketChannel.pipeline().addLast("HttpClientCodec", new HttpClientCodec());
                             socketChannel.pipeline().addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
                             // socketChannel.pipeline().addLast("ChunkedWriteHandler", new ChunkedWriteHandler());
                             socketChannel.pipeline().addLast("streamServerHandler",
@@ -479,7 +480,9 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
                     });
                     serverFuture = serverBootstrap.bind().sync();
                     serverFuture.await(4000);
-                    logger.debug("File server has started on port 7676 for all NIC's.");
+                    logger.info(
+                            "A File server has started at openHAB's IP {}:7676 you can tell your mobile phone app that this is a TV and send messages directly to openHAB.",
+                            openHABipAddress);
                 } catch (Exception e) {
                     logger.error("Exception occured when starting the streaming server: {}", e.getMessage());
                 }
@@ -489,6 +492,25 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
 
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
+        if (!(command instanceof RefreshType)) {
+            switch (channelUID.getId()) {
+                case CHANNEL_DISPLAY_NOTIFICATIONS:
+                    if (command instanceof OnOffType) {
+                    }
+                    break;
+                case CHANNEL_SEND_TEST_NOTIFICATION:
+                    if (command instanceof OnOffType) {
+                        // Works at sending a blank box probably due to missing icon data.
+                        sendJSONPostRequest(
+                                "{'filename': ('icon.png', <_io.BytesIO object at 0xffffacc46360>, 'application/octet-stream',{'Expires': '0'}), 'msg': 'It WORKS', 'title': 'Title text', 'fontsize': 0, 'bkgcolor':'#4CAF50'}");
+                    }
+                    break;
+                case CHANNEL_SEND_NOTIFICATION:
+                    if (command instanceof StringType) {
+                    }
+                    break;
+            }
+        }
     }
 
     @Override

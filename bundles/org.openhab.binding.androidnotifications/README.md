@@ -1,18 +1,24 @@
 # AndroidNotifications Binding
 
-This binding can talk with more then 1 Google Play store app, you only need one of them not both.
-This binding will try to standardize the way you interact with the apps, so if one app disappears, gets buggy, or adds a large cost, you can switch to one of the others with minimal changes to openHAB.
+This binding can talk with more then 1 Google Play Store app, you only need one of them not both.
+This binding will try to standardize the way you interact with any of the apps, so if one app disappears, gets buggy, gets caught sending data back home, or excessively nags with ads, you can switch to one of the others with minimal changes to openHAB.
 
 The two supported apps so far are:
 
-+ TvOverlay <https://play.google.com/store/apps/details?id=com.tabdeveloper.tvoverlay&hl=en_AU&gl=US>
-+ Android TV Notifications <https://play.google.com/store/apps/details?id=de.cyberdream.androidtv.notifications.google&hl=en&gl=US>
++ TvOverlay (working well) <https://play.google.com/store/apps/details?id=com.tabdeveloper.tvoverlay&hl=en_AU&gl=US>
++ Android TV Notifications (work in progress, do not try yet) <https://play.google.com/store/apps/details?id=de.cyberdream.androidtv.notifications.google&hl=en&gl=US>
 
 Other apps which are not yet supported, but could be are:
 
 + Push TV <https://play.google.com/store/apps/details?id=de.andreashuth.pushtv>
 
-Please refer to the github pages for help on how to setup the apps and any TV settings that are needed.
+## How to Install and Setup
+
+Please refer to the github pages linked just below for help on how to setup the apps and any TV settings that are needed.
+They will be the most up to date and detailed sources for using their app.
+
+### TvOverlay
+
 <https://github.com/gugutab/TvOverlay>
 
 ## Supported Things
@@ -25,8 +31,8 @@ This is close to working for the Android TV Notifications app, but not yet ready
 
 ## Discovery
 
-Is now supported.
 If you have both apps installed on your TV, only the first one discovered one will get added.
+You can manually add the thing and provide just the IP address and the setup from openHAB is very simple, please report back if yours does not get auto found so this can be improved for others.
 
 ## Thing Configuration
 

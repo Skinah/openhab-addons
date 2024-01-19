@@ -11,6 +11,8 @@
 
 		<channels>
 			<channel id="sendNotification" typeId="sendNotification"/>
+			<channel id="sendTestNotification" typeId="sendTestNotification"/>
+			<channel id="displayNotifications" typeId="displayNotifications"/>
 		</channels>
 
 		<config-description>
