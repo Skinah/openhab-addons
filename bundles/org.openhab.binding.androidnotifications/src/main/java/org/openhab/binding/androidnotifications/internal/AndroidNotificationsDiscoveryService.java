@@ -122,6 +122,10 @@ public class AndroidNotificationsDiscoveryService implements MDNSDiscoveryPartic
             return DiscoveryResultBuilder.create(thingUID).withLabel(name + " running TvOverlay")
                     .withProperties(properties).withRepresentationProperty(Thing.PROPERTY_MAC_ADDRESS).build();
         }
+        if (sendGetRequest("http://" + address + ":7979/")) {
+            logger.info(
+                    "Android may be running PiPup which could be supported, consider supporting further development and requesting this feature");
+        }
         return null;
     }
 

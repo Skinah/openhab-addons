@@ -62,7 +62,7 @@ public class StreamServerHandler extends ChannelInboundHandlerAdapter {
     private void sendOk(ChannelHandlerContext ctx) throws IOException {
         HttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
         response.headers().add("Content-Type", "text/html");
-        response.headers().add("Date", "Mon, 15 Jan 2024 11:42:11 GMT");
+        response.headers().add("Date", "Sat, 20 Jan 2024 11:38:14 GMT");
         response.headers().set("Connection", HttpHeaderValues.KEEP_ALIVE);
         response.headers().add("Content-Length", 2);
         ctx.channel().write(response);
@@ -73,7 +73,7 @@ public class StreamServerHandler extends ChannelInboundHandlerAdapter {
     private void sendEmptyOk(ChannelHandlerContext ctx) throws IOException {
         HttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
         response.headers().add("Content-Type", "text/html");
-        response.headers().add("Date", "Mon, 15 Jan 2024 11:42:12 GMT");
+        response.headers().add("Date", "Sat, 20 Jan 2024 11:38:15 GMT");
         response.headers().set("Connection", HttpHeaderValues.KEEP_ALIVE);
         response.headers().add("Content-Length", 0);
         ctx.channel().writeAndFlush(response);
@@ -91,14 +91,17 @@ public class StreamServerHandler extends ChannelInboundHandlerAdapter {
                 if ("GET".equalsIgnoreCase(httpRequest.method().toString())) {
                     // Some browsers send a query string after the path when refreshing a picture.
                     QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httpRequest.uri());
+                    logger.trace("Full URI is GET:{}", httpRequest.uri());
                     switch (httpRequest.uri()) {
                         case "/available":
-                            // logger.debug("From binding to TV/available:{}", handler.sendGetRequest("/available"));
-                            // sendOk(ctx);
+                            logger.debug("From binding to TV/available:{}", handler.sendGetRequest("/available"));
+                            sendOk(ctx);
                             break;
                         case "/id":
                             // logger.debug("From binding to TV/id:{}", handler.sendGetRequest("/id"));
+                            // sendOk(ctx);
                             // sendEmptyOk(ctx);
+                            // handler.sendJSONPostRequestWithPNG("/notify", "qualityofservice-1.png");
                             // handler.sendPostMultipartRequest();
                             break;
                         default:
@@ -108,30 +111,6 @@ public class StreamServerHandler extends ChannelInboundHandlerAdapter {
 
                 } else if ("POST".equalsIgnoreCase(httpRequest.method().toString())) {
                     logger.trace("Recieved request {}:{}", httpRequest.method(), httpRequest.uri());
-
-                    // DefaultHttpRequest request = (DefaultHttpRequest) msg;
-                    // logger.info("Stream Server recieved POST with headers of:{}", httpRequest.headers());
-
-                    // handler.sendRAWPostRequest();
-
-                    // handler.sendPostRequest("--myBoundary\r\n"
-                    // + "Content-Disposition: form-data; name=\"filename\"; filename=\"icon.png\"\r\n"
-                    // + "Content-Type: application/octet-stream" + "\r\n" + "Expires: 0\r\n" + "\r\n"
-                    // + "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGP6zwAAAgcBApocMXEAAAAASUVORK5CYII="
-                    // + "\r\n" + "--myBoundary" + "\r\n"
-                    // + "Content-Disposition: form-data; name=\"msg\"; filename=\"msg\"" + "\r\n" + "\r\n"
-                    // + "Tell me if this works please" + "\r\n" + "--myBoundary" + "\r\n"
-                    // + "Content-Disposition: form-data; name=\"title\"; filename=\"title\"\r\n" + "\r\n"
-                    // + "Home Assistant\r\n" + "--myBoundary--\r\n");
-
-                    // Works at sending a blank box probably due to missing icon data.
-                    // handler.sendJSONPostRequest(
-                    // "{'filename': ('icon.png', <_io.BytesIO object at 0xffffacc46360>,
-                    // 'application/octet-stream',{'Expires': '0'}), 'msg': 'It WORKS', 'title': 'Title text',
-                    // 'fontsize': 0, 'bkgcolor':'#4CAF50'}");
-
-                    handler.sendPostMultipartRequest();
-
                     sendOk(ctx);
                 } else {
                     logger.info("Stream Server recieved unknown request");
@@ -139,7 +118,7 @@ public class StreamServerHandler extends ChannelInboundHandlerAdapter {
             }
             if (msg instanceof HttpContent) {
                 HttpContent content = (HttpContent) msg;
-                logger.trace("HttpContent:{}", content.content());
+                // logger.trace("HttpContent:{}", content.content());
             }
             if (msg instanceof LastHttpContent) {
                 logger.trace("From App:{}", msg);
@@ -162,7 +141,7 @@ public class StreamServerHandler extends ChannelInboundHandlerAdapter {
             }
         } finally {
             ReferenceCountUtil.release(msg);
-            // ctx.close();
+            ctx.close();
         }
     }
 
@@ -210,5 +189,6 @@ public class StreamServerHandler extends ChannelInboundHandlerAdapter {
             return;
         }
         logger.trace("StreamServerHandler, handler removed.");
+        ctx.close();
     }
 }

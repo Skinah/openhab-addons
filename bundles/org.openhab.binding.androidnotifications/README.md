@@ -6,11 +6,12 @@ This binding will try to standardize the way you interact with any of the apps, 
 The two supported apps so far are:
 
 + TvOverlay (working well) <https://play.google.com/store/apps/details?id=com.tabdeveloper.tvoverlay&hl=en_AU&gl=US>
-+ Android TV Notifications (work in progress, do not try yet) <https://play.google.com/store/apps/details?id=de.cyberdream.androidtv.notifications.google&hl=en&gl=US>
++ Android TV Notifications (work in progress, Text based messages now work) <https://play.google.com/store/apps/details?id=de.cyberdream.androidtv.notifications.google&hl=en&gl=US>
 
 Other apps which are not yet supported, but could be are:
 
 + Push TV <https://play.google.com/store/apps/details?id=de.andreashuth.pushtv>
++ PiPup <https://play.google.com/store/apps/details?id=nl.rogro82.pipup>
 
 ## How to Install and Setup
 
@@ -94,9 +95,15 @@ There are as follows:
 
 ## Examples
 
+The most simple method is to use the `sendNotification` channel if you link it to a String item, you can use it like this in rules.
+sendCommand(TvOverlay_Send_Notification, "Put your message here")
+This has the advantage of not needing a thing type or UID, however you are limited to basic messages.
+
+For advanced messages you need to use ACTIONS.
+
 In these examples the `SonyTV` is the UniqueID of the `tvoverlaydisplay` thing.
-Because the duration is not specified in the shorter versions, you can change the length of the time the message is displayed for by using the `remote` app on your phone, or by starting the app on the TV, or by using the channel called `notificationDuration`.
-The same thing can be done with the full methods if you use `null` and provide no value, the app will resort to using the default values for any provided with `null`.
+Because the duration is not specified in the shorter versions, you can change the length of the time that the message is displayed for, by using the `remote` app on your phone, by starting the app on the TV, or by using the openHAB channel called `notificationDuration`.
+The same can be done with the full methods if you use `null` and provide no value, the app will resort to using the default values for any provided with `null`.
 
 getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:SonyTV").sendVideo(123, "Backyard", "Movement Detected","rtsp://admin:password@192.168.4.6:554/Streaming/Channels/102?transportmode=unicast&profile=Profile_1")
 
@@ -104,7 +111,5 @@ getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:SonyTV
 
 getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:SonyTV").sendImage(125, "Temperatures", "Graph of all rooms","http://openhab:8080/graph.jpg")
 
-
-An even simpler method is also available using the `sendNotification` channel if you link it to a String item.
-
-sendCommand(TvOverlay_Send_Notification, "Put your message here")
+The actions will return true or false based on if they succeed.
+Do not forget you can cancel long duration messages if you save the ID for using in other rules.
