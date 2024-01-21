@@ -272,7 +272,12 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
             @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor,
             @Nullable String corner, @Nullable Integer duration) {
         Notification notification = new Notification(messageID, title, message);
-        notification.setImage(imageURL + "?time=" + new Date().getTime());
+        // prevent cache from using an old image instead up updating every time.
+        if (imageURL.contains("?")) {
+            notification.setImage(imageURL + "&time=" + new Date().getTime());
+        } else {
+            notification.setImage(imageURL + "?time=" + new Date().getTime());
+        }
         notification.corner = corner;
         notification.duration = duration;
         if (largeIcon == null) {
