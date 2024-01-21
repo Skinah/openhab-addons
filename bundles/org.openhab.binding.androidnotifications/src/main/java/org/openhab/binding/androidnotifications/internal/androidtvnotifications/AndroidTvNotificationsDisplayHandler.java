@@ -86,8 +86,8 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
     private @Nullable ChannelFuture serverFuture = null;
     public String baseUrlAndPort = "";
     private String openHABipAddress = "";
-    private String position = "";
-    private String fontSize = "";
+    private String position = "0";
+    private String fontSize = "0";
 
     private AndroidTvNotificationsDisplayConfiguration config = new AndroidTvNotificationsDisplayConfiguration();
 
@@ -598,14 +598,15 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
                     break;
                 case CHANNEL_SEND_TEST_NOTIFICATION:
                     if (command instanceof OnOffType) {
-                        sendQueryRequest("/show?title=openHAB&msg=TheTestMessageWorks&fontsize=0&position=0");
+                        sendQueryRequest("/show?title=openHAB&msg=TheTestMessageWorks&fontsize=" + fontSize
+                                + "&position=" + position);
                     }
                     break;
                 case CHANNEL_SEND_NOTIFICATION:
                     if (command instanceof StringType) {
                         try {
                             sendQueryRequest("/show?title=openHAB&msg=" + URLEncoder.encode(command.toString(), "UTF-8")
-                                    + "&fontsize=0&position=0");
+                                    + "&fontsize=" + fontSize + "&position=" + position);
                         } catch (UnsupportedEncodingException e) {
                             logger.warn("UnsupportedEncodingException:{}", e.getMessage());
                         }
