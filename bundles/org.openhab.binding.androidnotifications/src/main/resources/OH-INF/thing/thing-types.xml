@@ -13,6 +13,8 @@
 			<channel id="sendNotification" typeId="sendNotification"/>
 			<channel id="sendTestNotification" typeId="sendTestNotification"/>
 			<channel id="displayNotifications" typeId="displayNotifications"/>
+			<channel id="displayCorner" typeId="displayCorner"/>
+			<channel id="fontSize" typeId="fontSize"/>
 		</channels>
 
 		<config-description>
@@ -87,14 +89,42 @@
 		<description>The corner used to display new messages in</description>
 		<state readOnly="false">
 			<options>
-				<option value="top_start">top_start</option>
-				<option value="top_end">top_end</option>
-				<option value="bottom_start">bottom_start</option>
-				<option value="bottom_end">bottom_end</option>
+				<option value="top_start">Top left</option>
+				<option value="top_end">Top right</option>
+				<option value="bottom_start">Bottom left</option>
+				<option value="bottom_end">Bottom right</option>
 			</options>
 		</state>
 	</channel-type>
 
+	<channel-type id="displayCorner">
+		<item-type>String</item-type>
+		<label>Display Corner</label>
+		<description>The corner used to display new messages in</description>
+		<state readOnly="false">
+			<options>
+				<option value="4">Centre</option>
+				<option value="3">Top left</option>
+				<option value="2">Top right</option>
+				<option value="1">Bottom left</option>
+				<option value="0">Bottom right</option>
+			</options>
+		</state>
+	</channel-type>
+
+	<channel-type id="fontSize">
+		<item-type>String</item-type>
+		<label>Font Size</label>
+		<description>How large to make the font in messages</description>
+		<state readOnly="false">
+			<options>
+				<option value="1">Small</option>
+				<option value="0">Medium</option>
+				<option value="2">Large</option>
+				<option value="3">Max</option>
+			</options>
+		</state>
+	</channel-type>
 
 	<channel-type id="notificationDuration">
 		<item-type>Number:Time</item-type>

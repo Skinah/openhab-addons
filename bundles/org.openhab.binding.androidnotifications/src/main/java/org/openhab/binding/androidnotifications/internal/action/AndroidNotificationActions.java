@@ -118,9 +118,8 @@ public class AndroidNotificationActions implements ThingActions {
             @ActionInput(name = "duration") @Nullable Integer duration) {
         TvOverlayDisplayHandler localHandler = tvOverlayDisplayHandler;
         if (localHandler != null) {
-            localHandler.sendImage(messageID, title, message, imageURL, largeIcon, smallIcon, smallIconColor, corner,
-                    duration);
-            return true;
+            return localHandler.sendImage(messageID, title, message, imageURL, largeIcon, smallIcon, smallIconColor,
+                    corner, duration);
         }
         return false;
     }
@@ -133,10 +132,13 @@ public class AndroidNotificationActions implements ThingActions {
             @ActionInput(name = "smallIconColor") @Nullable String smallIconColor,
             @ActionInput(name = "corner") @Nullable String corner,
             @ActionInput(name = "duration") @Nullable Integer duration) {
-        TvOverlayDisplayHandler localHandler = tvOverlayDisplayHandler;
-        if (localHandler != null) {
-            localHandler.sendText(messageID, title, message, largeIcon, smallIcon, smallIconColor, corner, duration);
-            return true;
+        if (tvOverlayDisplayHandler != null) {
+            return tvOverlayDisplayHandler.sendText(messageID, title, message, largeIcon, smallIcon, smallIconColor,
+                    corner, duration);
+        }
+        if (androidTvNotificationsDisplayHandler != null) {
+            return androidTvNotificationsDisplayHandler.sendText(messageID, title, message, largeIcon, smallIcon,
+                    smallIconColor, corner, duration);
         }
         return false;
     }
@@ -152,9 +154,8 @@ public class AndroidNotificationActions implements ThingActions {
             @ActionInput(name = "duration") @Nullable Integer duration) {
         TvOverlayDisplayHandler localHandler = tvOverlayDisplayHandler;
         if (localHandler != null) {
-            localHandler.sendVideo(messageID, title, message, videoURL, largeIcon, smallIcon, smallIconColor, corner,
-                    duration);
-            return true;
+            return localHandler.sendVideo(messageID, title, message, videoURL, largeIcon, smallIcon, smallIconColor,
+                    corner, duration);
         }
         return false;
     }

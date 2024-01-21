@@ -49,9 +49,11 @@ public class AndroidNotificationsBindingConstants {
     public static final String CHANNEL_FIXED_NOTIFICATIONS_VISIBILITY = "fixedNotificationsVisibility";
     public static final String CHANNEL_OVERLAY_VISIBILITY = "overlayVisibility";
     public static final String CHANNEL_CLOCK_VISABILITY = "clockOverlayVisibility";
-    public static final String CHANNEL_DISPLAY_CORNER = "hotCorner";
+    public static final String CHANNEL_DISPLAY_CORNER = "hotCorner";// TvOverlay
+    public static final String CHANNEL_DISPLAY_POSITION = "displayCorner";// ATVN
     public static final String CHANNEL_NOTIFICATION_DURATION = "notificationDuration";
     public static final String CHANNEL_DISPLAY_NOTIFICATIONS = "displayNotifications";
     public static final String CHANNEL_SEND_NOTIFICATION = "sendNotification";
     public static final String CHANNEL_SEND_TEST_NOTIFICATION = "sendTestNotification";
+    public static final String CHANNEL_FONT_SIZE = "fontSize";
 }

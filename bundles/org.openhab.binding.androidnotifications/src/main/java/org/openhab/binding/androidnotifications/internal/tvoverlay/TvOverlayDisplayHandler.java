@@ -16,6 +16,7 @@ import static org.openhab.binding.androidnotifications.internal.AndroidNotificat
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -210,6 +211,7 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
         try {
             ContentResponse contentResponse = request.send();
             if (contentResponse.getStatus() == 200) {
+                logger.trace("TV returned:{}", contentResponse.getContentAsString());
                 return contentResponse.getContentAsString();
             } else {
                 errorReason = String.format("TV request failed with %d: %s", contentResponse.getStatus(),
@@ -231,7 +233,7 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
         return gson.toJson(object);
     }
 
-    public void sendText(int messageID, @Nullable String title, @Nullable String message, @Nullable String largeIcon,
+    public boolean sendText(int messageID, @Nullable String title, @Nullable String message, @Nullable String largeIcon,
             @Nullable String smallIcon, @Nullable String smallIconColor, @Nullable String corner,
             @Nullable Integer duration) {
         Notification notification = new Notification(messageID, title, message);
@@ -240,10 +242,11 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
         notification.largeIcon = largeIcon;
         notification.smallIcon = smallIcon;
         notification.smallIconColor = smallIconColor;
-        sendPostRequest("/notify", toJson(notification));
+        return "{\"success\":true,\"message\":\"Notification received\"}"
+                .equals(sendPostRequest("/notify", toJson(notification)));
     }
 
-    public void sendVideo(int messageID, @Nullable String title, @Nullable String message, String videoURL,
+    public boolean sendVideo(int messageID, @Nullable String title, @Nullable String message, String videoURL,
             @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor,
             @Nullable String corner, @Nullable Integer duration) {
         Notification notification = new Notification(messageID, title, message);
@@ -261,14 +264,15 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
             notification.smallIcon = smallIcon;
         }
         notification.smallIconColor = smallIconColor;
-        sendPostRequest("/notify", toJson(notification));
+        return "{\"success\":true,\"message\":\"Notification received\"}"
+                .equals(sendPostRequest("/notify", toJson(notification)));
     }
 
-    public void sendImage(int messageID, @Nullable String title, @Nullable String message, String imageURL,
+    public boolean sendImage(int messageID, @Nullable String title, @Nullable String message, String imageURL,
             @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor,
             @Nullable String corner, @Nullable Integer duration) {
         Notification notification = new Notification(messageID, title, message);
-        notification.setImage(imageURL);
+        notification.setImage(imageURL + "?time=" + new Date().getTime());
         notification.corner = corner;
         notification.duration = duration;
         if (largeIcon == null) {
@@ -282,6 +286,7 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
             notification.smallIcon = smallIcon;
         }
         notification.smallIconColor = smallIconColor;
-        sendPostRequest("/notify", toJson(notification));
+        return "{\"success\":true,\"message\":\"Notification received\"}"
+                .equals(sendPostRequest("/notify", toJson(notification)));
     }
 }

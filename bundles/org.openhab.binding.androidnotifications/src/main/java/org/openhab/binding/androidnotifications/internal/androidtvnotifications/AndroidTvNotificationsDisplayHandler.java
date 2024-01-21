@@ -86,6 +86,8 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
     private @Nullable ChannelFuture serverFuture = null;
     public String baseUrlAndPort = "";
     private String openHABipAddress = "";
+    private String position = "";
+    private String fontSize = "";
 
     private AndroidTvNotificationsDisplayConfiguration config = new AndroidTvNotificationsDisplayConfiguration();
 
@@ -451,7 +453,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
         } catch (ExecutionException e) {
             errorReason = String.format("ExecutionException: %s", e.getMessage());
         }
-        logger.info("Returned Error Message:{}", errorReason);
+        logger.warn("TV returned error message:{}", errorReason);
         return errorReason;
     }
 
@@ -609,6 +611,16 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
                         }
                     }
                     break;
+                case CHANNEL_FONT_SIZE:
+                    if (command instanceof StringType) {
+                        fontSize = command.toString();
+                    }
+                    break;
+                case CHANNEL_DISPLAY_POSITION:
+                    if (command instanceof StringType) {
+                        position = command.toString();
+                    }
+                    break;
             }
         }
     }
@@ -636,36 +648,41 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
         return Collections.singleton(AndroidNotificationActions.class);
     }
 
-    public void sendText(int messageID, @Nullable String title, @Nullable String message, @Nullable String largeIcon,
+    public boolean sendText(int messageID, @Nullable String title, @Nullable String message, @Nullable String largeIcon,
             @Nullable String smallIcon, @Nullable String smallIconColor, @Nullable String corner,
             @Nullable Integer duration) {
         try {
-            sendQueryRequest("/show?title=" + URLEncoder.encode(title, "UTF-8") + "&msg="
-                    + URLEncoder.encode(message, "UTF-8") + "&fontsize=0&position=0");
+            return "OK".equals(sendQueryRequest("/show?title=" + URLEncoder.encode(title, "UTF-8") + "&msg="
+                    + URLEncoder.encode(message, "UTF-8") + "&fontsize=" + fontSize + "&position=" + position));
         } catch (UnsupportedEncodingException e) {
             logger.warn("UnsupportedEncodingException:{}", e.getMessage());
         }
+        return false;
     }
 
-    public void sendVideo(int messageID, @Nullable String title, @Nullable String message, String videoURL,
+    public boolean sendVideo(int messageID, @Nullable String title, @Nullable String message, String videoURL,
             @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor,
             @Nullable String corner, @Nullable Integer duration) {
         try {
-            sendQueryRequest("/show?title=openHAB&msg=" + URLEncoder.encode("Video is NOT implemented yet", "UTF-8")
-                    + "&fontsize=0&position=0");
+            return "OK".equals(sendQueryRequest(
+                    "/show?title=openHAB&msg=" + URLEncoder.encode("Video is NOT implemented yet", "UTF-8")
+                            + "&fontsize=" + fontSize + "&position=" + position));
         } catch (UnsupportedEncodingException e) {
             logger.warn("UnsupportedEncodingException:{}", e.getMessage());
         }
+        return false;
     }
 
-    public void sendImage(int messageID, @Nullable String title, @Nullable String message, String imageURL,
+    public boolean sendImage(int messageID, @Nullable String title, @Nullable String message, String imageURL,
             @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor,
             @Nullable String corner, @Nullable Integer duration) {
         try {
-            sendQueryRequest("/show?title=openHAB&msg=" + URLEncoder.encode("Image is NOT implemented yet", "UTF-8")
-                    + "&fontsize=0&position=0");
+            return "OK".equals(sendQueryRequest(
+                    "/show?title=openHAB&msg=" + URLEncoder.encode("Image is NOT implemented yet", "UTF-8")
+                            + "&fontsize=" + fontSize + "&position=" + position));
         } catch (UnsupportedEncodingException e) {
             logger.warn("UnsupportedEncodingException:{}", e.getMessage());
         }
+        return false;
     }
 }
