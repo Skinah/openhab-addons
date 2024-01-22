@@ -105,6 +105,7 @@ public class StreamServerHandler extends ChannelInboundHandlerAdapter {
                             // handler.sendPostMultipartRequest();
                             break;
                         default:
+                            sendEmptyOk(ctx);
                             logger.info("Stream Server recieved unknown request {}:{}", httpRequest.method(),
                                     httpRequest.uri());
                     }

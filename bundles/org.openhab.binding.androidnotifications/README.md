@@ -63,9 +63,11 @@ Not yet fully documented, just use the main UI to see what is available, and rea
 | fixedNotificationsVisibility | Dimmer | RW         | Change how transparent the fixed notifications are |
 | overlayVisibility         | Dimmer    | RW         | Use this to reduce the brightness of the main TV screen allowing messages to be seen easier |
 | clockOverlayVisibility    | Dimmer    | RW         | Change how transparent the clock is |
-| hotCorner                 | String    | RW         | Change which corner of the screen the messages and clock get displayed in |
+| hotCorner                 | String    | RW         | Change which corner of the screen the messages and clock get displayed in. TvOverlay string. |
+| displayCorner             | String    | RW         | Change which corner of the screen the messages and clock get displayed in. Values 0-4 |
 | notificationDuration      | Number:Time | RW       | Change the default amount of time the messages get displayed for if `null` is used in a message |
 | displayNotifications      | Switch    | RW         | Show or hide any normal non fixed type notifications |
+| fontSize                  | String    | RW         | Size of the font, value 0 to 4 |       
 
 ## Actions
 
@@ -92,6 +94,8 @@ There are as follows:
             
 + sendVideo(int messageID, @Nullable String title, @Nullable String message, String videoURL, @Nullable String largeIcon, @Nullable String smallIcon,
             @Nullable String smallIconColor, @Nullable String corner, @Nullable Integer duration)
+            
+When using TvOverlay, the icons can be any of the material design icons (mdi), for example  `mdi:home-alert-outline` and `mdi:chevron-up-circle-outline` are valid strings, but many more can be selected.
 
 ## Examples
 
@@ -109,7 +113,19 @@ getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:SonyTV
 
 getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:SonyTV").sendText(124, null, "Frank arrived home")
 
-getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:SonyTV").sendImage(125, "Temperatures", "Graph of all rooms","http://openhab:8080/graph.jpg")
+Any picture files that are in your `openHAB-conf\html` folder can be used by using the static path.
+
+getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:SonyTV").sendImage(125, "Temperatures", "Graph of all rooms","http://openhab:8080/static/graph.jpg")
 
 The actions will return true or false based on if they succeed.
-Do not forget you can cancel long duration messages if you save the ID for using in other rules.
+Do not forget you can also cancel long duration messages if you save the ID for using in other rules.
+
+```
+var messageID=123
+var result = getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:SonyTV").sendText(messageID,"The garage door is open for >5 minutes", "Please close the roller door")
+  if(!result){
+    sendLogNotification("Message failed to reach the TV as it may be turned off. The garage door has been left open.")
+  }else{
+    //You can use messageID to cancel or change the message to include a picture if you wish.
+  }
+```

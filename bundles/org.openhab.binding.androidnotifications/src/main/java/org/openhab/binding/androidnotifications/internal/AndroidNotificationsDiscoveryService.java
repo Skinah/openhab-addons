@@ -45,12 +45,12 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The {@link AndroidNotificationsDiscoveryService} Discovers and adds any Android TV devices found that have the
- * correct port answering to indicate the app is running.
+ * correct port answering to indicate a supported app is running.
  *
  * @author Matthew Skinner - Initial contribution
  */
 @NonNullByDefault
-@Component(service = MDNSDiscoveryParticipant.class, immediate = true, configurationPid = "discovery.googletv")
+@Component(service = MDNSDiscoveryParticipant.class, immediate = true, configurationPid = "discovery.androidnotifications")
 public class AndroidNotificationsDiscoveryService implements MDNSDiscoveryParticipant {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final HttpClient httpClient;
@@ -95,7 +95,7 @@ public class AndroidNotificationsDiscoveryService implements MDNSDiscoveryPartic
         if (!service.hasData()) {
             return null;
         }
-        String name = service.getName().replaceAll("\\s+", "");
+        String name = service.getName().replaceAll("\\s+", ""); // remove spaces as UID does not allow them
         String macAddress = service.getPropertyString("bt");
         String address;
         InetAddress[] ipAddresses = service.getInet4Addresses();
@@ -116,15 +116,14 @@ public class AndroidNotificationsDiscoveryService implements MDNSDiscoveryPartic
             return DiscoveryResultBuilder.create(thingUID).withLabel(name + " running TvOverlay")
                     .withProperties(properties).withRepresentationProperty(Thing.PROPERTY_MAC_ADDRESS).build();
         }
-        if (sendGetRequest("http://" + address + ":7676/")) {
+        if (sendGetRequest("http://" + address + ":7676/show?title=openHAB&msg=Discovered&fontsize=0&position=0")) {
             ThingUID thingUID = new ThingUID(NFATV_DISPLAY_THING_TYPE, name);
             Map<String, Object> properties = Map.of(Thing.PROPERTY_MAC_ADDRESS, macAddress, CONFIG_ADDRESS, address);
             return DiscoveryResultBuilder.create(thingUID).withLabel(name + " running TvOverlay")
                     .withProperties(properties).withRepresentationProperty(Thing.PROPERTY_MAC_ADDRESS).build();
         }
         if (sendGetRequest("http://" + address + ":7979/")) {
-            logger.info(
-                    "Android may be running PiPup which could be supported, consider supporting further development and requesting this feature");
+            logger.info("Android may be running PiPup which could be supported, consider requesting this feature");
         }
         return null;
     }

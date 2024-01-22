@@ -118,8 +118,8 @@
 		<description>How large to make the font in messages</description>
 		<state readOnly="false">
 			<options>
-				<option value="1">Small</option>
-				<option value="0">Medium</option>
+				<option value="0">Small</option>
+				<option value="1">Medium</option>
 				<option value="2">Large</option>
 				<option value="3">Max</option>
 			</options>
