@@ -75,24 +75,25 @@ Please read the example section below if these do not make sense to you.
 The messageID is very important as you can use it to edit a message even if it is still displaying on the TV screen.
 It can also be used to delete the message if it is still waiting in the queue. 
 
-There are 3 shorter ways to send messages, and these use the apps default settings for the missing options.
+There are 3 shorter ways to send messages, and these use the apps default settings for any of the missing options.
 There are as follows:
 
-+ sendText(String messageID, @Nullable String title, String message)
++ boolean sendText(String messageID, @Nullable String title, String message)
 
-+ sendImage(String messageID, @Nullable String title, @Nullable String message, String imageURL)
++ boolean sendImage(String messageID, @Nullable String title, @Nullable String message, String imageURL)
 
-+ sendVideo(String messageID, @Nullable String title, @Nullable String message, String videoURL)
++ boolean sendVideo(String messageID, @Nullable String title, @Nullable String message, String videoURL)
 
 The 3 longer versions give access to all variables and any marked as `@Nullable` can have `null` sent to use the programs default setting if you do not wish to provide one.
+The down side is you will need to read the API to use these, where the shorter versions can be used easily and allow changing programs much easier.
 There are as follows:    
         
-+ sendText(String messageID, @Nullable String title, String message, @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor,
++ boolean sendText(String messageID, @Nullable String title, String message, @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor,
             @Nullable String corner, @Nullable Integer duration)
                        
-+ sendImage(String messageID, @Nullable String title, @Nullable String message, String imageURL, @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor, @Nullable String corner, @Nullable Integer duration)            
++ boolean sendImage(String messageID, @Nullable String title, @Nullable String message, String imageURL, @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor, @Nullable String corner, @Nullable Integer duration)            
             
-+ sendVideo(String messageID, @Nullable String title, @Nullable String message, String videoURL, @Nullable String largeIcon, @Nullable String smallIcon,
++ boolean sendVideo(String messageID, @Nullable String title, @Nullable String message, String videoURL, @Nullable String largeIcon, @Nullable String smallIcon,
             @Nullable String smallIconColor, @Nullable String corner, @Nullable Integer duration)
             
 + boolean sendFixedNotification(String messageID, @Nullable String messageColor, @Nullable String message,
@@ -104,7 +105,7 @@ When using TvOverlay, the icons can be any of the material design icons (mdi), f
 
 ## Examples
 
-The most simple method is to use the `sendNotification` channel if you link it to a String item, you can use it like this in rules.
+The most simple method is to use the `sendNotification` channel if you link it to a String item, you can use it in rules like this.
 sendCommand(TvOverlay_Send_Notification, "Put your message here")
 This has the advantage of not needing a thing type or UID, however you are limited to basic messages.
 
@@ -113,17 +114,18 @@ For advanced messages you need to use ACTIONS.
 In these examples the `SonyTV` is the UniqueID of the `tvoverlaydisplay` thing.
 Because the duration is not specified in the shorter versions, you can change the length of the time that the message is displayed for, by using the `remote` app on your phone, by starting the app on the TV, or by using the openHAB channel called `notificationDuration`.
 The same can be done with the full methods if you use `null` and provide no value, the app will resort to using the default values for any provided with `null`.
+Most of these features have a channel that can be used.
 
 getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:SonyTV").sendVideo("123", "Backyard", "Movement Detected","rtsp://admin:password@192.168.4.6:554/Streaming/Channels/102?transportmode=unicast&profile=Profile_1")
 
 getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:SonyTV").sendText("124", null, "Frank arrived home")
 
-Any picture files that are in your `openHAB-conf\html` folder can be used by using the static path.
+Any picture files that are in your `openHAB-conf\html` folder can be used by providing the static path.
 
 getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:SonyTV").sendImage("125", "Temperatures", "Graph of all rooms","http://openhab:8080/static/graph.jpg")
 
 The actions will return true or false based on if they succeed.
-Do not forget you can also cancel long duration messages if you save the ID for using in other rules.
+You can also cancel long duration messages if you save the ID for use in other rules.
 
 ```
 var messageID="123"
@@ -134,3 +136,13 @@ var result = getActions("androidnotifications", "androidnotifications:tvoverlayd
     //You can use messageID to cancel or change the message to include a picture if you wish.
   }
 ```
+
+## Fixed Notification Examples
+
+Display a logo of which coloured bin needs to get taken out to the street.
+getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:TheTV").sendFixedNotification("YellowBin", null, null,"mdi:trash-can-outline","FEEA3C", "FCEF7B", null, 21600, "circle", true)
+
+getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:TheTV").sendFixedNotification("RedBin", null, null,"mdi:trash-can-outline","E13D3A", "EA6E6B", null, 21600, "circle", true)
+
+Display a warning logo that the sprinklers will be running soon to bring washing inside.
+getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:TheTV").sendFixedNotification("SprinklerWarning", null, null,"mdi:sprinkler-variant","62B1F0", "85C3F5", null, 21600, "circle", true)
