@@ -23,7 +23,7 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 @NonNullByDefault
 public class Notification {
-    public int id = 0;
+    public String id = "0";
     public @Nullable String title;
     public @Nullable String message;
     public @Nullable String source = "openHAB";
@@ -35,7 +35,7 @@ public class Notification {
     public @Nullable String corner;
     public @Nullable Integer duration;
 
-    public Notification(int id, @Nullable String title, @Nullable String message) {
+    public Notification(String id, @Nullable String title, @Nullable String message) {
         this.id = id;
         if (title == null) {
             this.title = ""; // workaround otherwise the API copies the message to the title

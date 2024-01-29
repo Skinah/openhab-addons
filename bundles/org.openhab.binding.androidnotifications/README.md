@@ -78,22 +78,27 @@ It can also be used to delete the message if it is still waiting in the queue.
 There are 3 shorter ways to send messages, and these use the apps default settings for the missing options.
 There are as follows:
 
-+ sendText(int messageID, @Nullable String title, String message)
++ sendText(String messageID, @Nullable String title, String message)
 
-+ sendImage(int messageID, @Nullable String title, @Nullable String message, String imageURL)
++ sendImage(String messageID, @Nullable String title, @Nullable String message, String imageURL)
 
-+ sendVideo(int messageID, @Nullable String title, @Nullable String message, String videoURL)
++ sendVideo(String messageID, @Nullable String title, @Nullable String message, String videoURL)
 
 The 3 longer versions give access to all variables and any marked as `@Nullable` can have `null` sent to use the programs default setting if you do not wish to provide one.
 There are as follows:    
         
-+ sendText(int messageID, @Nullable String title, String message, @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor,
++ sendText(String messageID, @Nullable String title, String message, @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor,
             @Nullable String corner, @Nullable Integer duration)
                        
-+ sendImage(int messageID, @Nullable String title, @Nullable String message, String imageURL, @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor, @Nullable String corner, @Nullable Integer duration)            
++ sendImage(String messageID, @Nullable String title, @Nullable String message, String imageURL, @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor, @Nullable String corner, @Nullable Integer duration)            
             
-+ sendVideo(int messageID, @Nullable String title, @Nullable String message, String videoURL, @Nullable String largeIcon, @Nullable String smallIcon,
++ sendVideo(String messageID, @Nullable String title, @Nullable String message, String videoURL, @Nullable String largeIcon, @Nullable String smallIcon,
             @Nullable String smallIconColor, @Nullable String corner, @Nullable Integer duration)
+            
++ boolean sendFixedNotification(String messageID, @Nullable String messageColor, @Nullable String message,
+            @Nullable String icon, @Nullable String iconColor, @Nullable String borderColor,
+            @Nullable String backgroundColor, @Nullable Integer expiration, @Nullable String shape,
+            @Nullable Boolean visible)
             
 When using TvOverlay, the icons can be any of the material design icons (mdi), for example  `mdi:home-alert-outline` and `mdi:chevron-up-circle-outline` are valid strings, but many more can be selected.
 
@@ -109,19 +114,19 @@ In these examples the `SonyTV` is the UniqueID of the `tvoverlaydisplay` thing.
 Because the duration is not specified in the shorter versions, you can change the length of the time that the message is displayed for, by using the `remote` app on your phone, by starting the app on the TV, or by using the openHAB channel called `notificationDuration`.
 The same can be done with the full methods if you use `null` and provide no value, the app will resort to using the default values for any provided with `null`.
 
-getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:SonyTV").sendVideo(123, "Backyard", "Movement Detected","rtsp://admin:password@192.168.4.6:554/Streaming/Channels/102?transportmode=unicast&profile=Profile_1")
+getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:SonyTV").sendVideo("123", "Backyard", "Movement Detected","rtsp://admin:password@192.168.4.6:554/Streaming/Channels/102?transportmode=unicast&profile=Profile_1")
 
-getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:SonyTV").sendText(124, null, "Frank arrived home")
+getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:SonyTV").sendText("124", null, "Frank arrived home")
 
 Any picture files that are in your `openHAB-conf\html` folder can be used by using the static path.
 
-getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:SonyTV").sendImage(125, "Temperatures", "Graph of all rooms","http://openhab:8080/static/graph.jpg")
+getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:SonyTV").sendImage("125", "Temperatures", "Graph of all rooms","http://openhab:8080/static/graph.jpg")
 
 The actions will return true or false based on if they succeed.
 Do not forget you can also cancel long duration messages if you save the ID for using in other rules.
 
 ```
-var messageID=123
+var messageID="123"
 var result = getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:SonyTV").sendText(messageID,"The garage door is open for >5 minutes", "Please close the roller door")
   if(!result){
     sendLogNotification("Message failed to reach the TV as it may be turned off. The garage door has been left open.")

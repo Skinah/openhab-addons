@@ -649,9 +649,9 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
         return Collections.singleton(AndroidNotificationActions.class);
     }
 
-    public boolean sendText(int messageID, @Nullable String title, @Nullable String message, @Nullable String largeIcon,
-            @Nullable String smallIcon, @Nullable String smallIconColor, @Nullable String corner,
-            @Nullable Integer duration) {
+    public boolean sendText(String messageID, @Nullable String title, @Nullable String message,
+            @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor,
+            @Nullable String corner, @Nullable Integer duration) {
         try {
             return "OK".equals(sendQueryRequest("/show?title=" + URLEncoder.encode(title, "UTF-8") + "&msg="
                     + URLEncoder.encode(message, "UTF-8") + "&fontsize=" + fontSize + "&position=" + position));
@@ -661,7 +661,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
         return false;
     }
 
-    public boolean sendVideo(int messageID, @Nullable String title, @Nullable String message, String videoURL,
+    public boolean sendVideo(String messageID, @Nullable String title, @Nullable String message, String videoURL,
             @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor,
             @Nullable String corner, @Nullable Integer duration) {
         try {
@@ -674,7 +674,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
         return false;
     }
 
-    public boolean sendImage(int messageID, @Nullable String title, @Nullable String message, String imageURL,
+    public boolean sendImage(String messageID, @Nullable String title, @Nullable String message, String imageURL,
             @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor,
             @Nullable String corner, @Nullable Integer duration) {
         try {
@@ -684,6 +684,14 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
         } catch (UnsupportedEncodingException e) {
             logger.warn("UnsupportedEncodingException:{}", e.getMessage());
         }
+        return false;
+    }
+
+    public boolean sendFixedNotification(String messageID, @Nullable String messageColor, @Nullable String message,
+            @Nullable String icon, @Nullable String iconColor, @Nullable String borderColor,
+            @Nullable String backgroundColor, @Nullable Integer expiration, @Nullable String shape,
+            @Nullable Boolean visible) {
+        logger.info("Feature only supported in TvOverlay app");
         return false;
     }
 }

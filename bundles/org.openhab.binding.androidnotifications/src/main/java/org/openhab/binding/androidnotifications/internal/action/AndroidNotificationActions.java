@@ -39,7 +39,7 @@ public class AndroidNotificationActions implements ThingActions {
     private @Nullable TvOverlayDisplayHandler tvOverlayDisplayHandler = null;
     private @Nullable AndroidTvNotificationsDisplayHandler androidTvNotificationsDisplayHandler = null;
 
-    public static boolean sendImage(@Nullable ThingActions actions, int messageID, @Nullable String title,
+    public static boolean sendImage(@Nullable ThingActions actions, String messageID, @Nullable String title,
             @Nullable String message, String imageURL, @Nullable String largeIcon, @Nullable String smallIcon,
             @Nullable String smallIconColor, @Nullable String corner, @Nullable Integer duration) {
         if (actions instanceof AndroidNotificationActions) {
@@ -51,7 +51,7 @@ public class AndroidNotificationActions implements ThingActions {
         }
     }
 
-    public static boolean sendImage(@Nullable ThingActions actions, int messageID, @Nullable String title,
+    public static boolean sendImage(@Nullable ThingActions actions, String messageID, @Nullable String title,
             @Nullable String message, String imageURL) {
         if (actions instanceof AndroidNotificationActions) {
             ((AndroidNotificationActions) actions).sendImage(messageID, title, message, imageURL, null, null, null,
@@ -62,7 +62,7 @@ public class AndroidNotificationActions implements ThingActions {
         }
     }
 
-    public static boolean sendText(@Nullable ThingActions actions, int messageID, @Nullable String title,
+    public static boolean sendText(@Nullable ThingActions actions, String messageID, @Nullable String title,
             String message, @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor,
             @Nullable String corner, @Nullable Integer duration) {
         if (actions instanceof AndroidNotificationActions) {
@@ -74,7 +74,7 @@ public class AndroidNotificationActions implements ThingActions {
         }
     }
 
-    public static boolean sendText(@Nullable ThingActions actions, int messageID, @Nullable String title,
+    public static boolean sendText(@Nullable ThingActions actions, String messageID, @Nullable String title,
             String message) {
         if (actions instanceof AndroidNotificationActions) {
             ((AndroidNotificationActions) actions).sendText(messageID, title, message, null, null, null, null, null);
@@ -84,7 +84,7 @@ public class AndroidNotificationActions implements ThingActions {
         }
     }
 
-    public static boolean sendVideo(@Nullable ThingActions actions, int messageID, @Nullable String title,
+    public static boolean sendVideo(@Nullable ThingActions actions, String messageID, @Nullable String title,
             @Nullable String message, String videoURL, @Nullable String largeIcon, @Nullable String smallIcon,
             @Nullable String smallIconColor, @Nullable String corner, @Nullable Integer duration) {
         if (actions instanceof AndroidNotificationActions) {
@@ -96,7 +96,7 @@ public class AndroidNotificationActions implements ThingActions {
         }
     }
 
-    public static boolean sendVideo(@Nullable ThingActions actions, int messageID, @Nullable String title,
+    public static boolean sendVideo(@Nullable ThingActions actions, String messageID, @Nullable String title,
             @Nullable String message, String videoURL) {
         if (actions instanceof AndroidNotificationActions) {
             ((AndroidNotificationActions) actions).sendVideo(messageID, title, message, videoURL, null, null, null,
@@ -108,7 +108,7 @@ public class AndroidNotificationActions implements ThingActions {
     }
 
     @RuleAction(label = "@text/actionSendImageLabel", description = "@text/actionSendImageDesc")
-    public boolean sendImage(@ActionInput(name = "messageID") int messageID,
+    public boolean sendImage(@ActionInput(name = "messageID") String messageID,
             @ActionInput(name = "title") @Nullable String title,
             @ActionInput(name = "message") @Nullable String message, @ActionInput(name = "imageURL") String imageURL,
             @ActionInput(name = "largeIcon") @Nullable String largeIcon,
@@ -125,7 +125,7 @@ public class AndroidNotificationActions implements ThingActions {
     }
 
     @RuleAction(label = "@text/actionSendTextLabel", description = "@text/actionSendTextDesc")
-    public boolean sendText(@ActionInput(name = "messageID") int messageID,
+    public boolean sendText(@ActionInput(name = "messageID") String messageID,
             @ActionInput(name = "title") @Nullable String title, @ActionInput(name = "message") String message,
             @ActionInput(name = "largeIcon") @Nullable String largeIcon,
             @ActionInput(name = "smallIcon") @Nullable String smallIcon,
@@ -144,7 +144,7 @@ public class AndroidNotificationActions implements ThingActions {
     }
 
     @RuleAction(label = "@text/actionSendVideoLabel", description = "@text/actionSendVideoDesc")
-    public boolean sendVideo(@ActionInput(name = "messageID") int messageID,
+    public boolean sendVideo(@ActionInput(name = "messageID") String messageID,
             @ActionInput(name = "title") @Nullable String title,
             @ActionInput(name = "message") @Nullable String message, @ActionInput(name = "videoURL") String videoURL,
             @ActionInput(name = "largeIcon") @Nullable String largeIcon,
@@ -156,6 +156,40 @@ public class AndroidNotificationActions implements ThingActions {
         if (localHandler != null) {
             return localHandler.sendVideo(messageID, title, message, videoURL, largeIcon, smallIcon, smallIconColor,
                     corner, duration);
+        }
+        return false;
+    }
+
+    public static boolean sendFixedNotification(@Nullable ThingActions actions, String messageID,
+            @Nullable String messageColor, @Nullable String message, @Nullable String icon, @Nullable String iconColor,
+            @Nullable String borderColor, @Nullable String backgroundColor, @Nullable Integer expiration,
+            @Nullable String shape, @Nullable Boolean visible) {
+        if (actions instanceof AndroidNotificationActions) {
+            ((AndroidNotificationActions) actions).sendFixedNotification(messageID, messageColor, message, icon,
+                    iconColor, borderColor, backgroundColor, expiration, shape, visible);
+            return true;
+        } else {
+            throw new IllegalArgumentException("Instance is not an AndroidNotificationActions class.");
+        }
+    }
+
+    @RuleAction(label = "@text/actionSendFixedNotificationLabel", description = "@text/actionSendFixedNotificationDesc")
+    public boolean sendFixedNotification(@ActionInput(name = "messageID") String messageID,
+            @ActionInput(name = "messageColor") @Nullable String messageColor,
+            @ActionInput(name = "message") @Nullable String message, @ActionInput(name = "icon") @Nullable String icon,
+            @ActionInput(name = "iconColor") @Nullable String iconColor,
+            @ActionInput(name = "borderColor") @Nullable String borderColor,
+            @ActionInput(name = "backgroundColor") @Nullable String backgroundColor,
+            @ActionInput(name = "expiration") @Nullable Integer expiration,
+            @ActionInput(name = "shape") @Nullable String shape,
+            @ActionInput(name = "visible") @Nullable Boolean visible) {
+        if (tvOverlayDisplayHandler != null) {
+            return tvOverlayDisplayHandler.sendFixedNotification(messageID, messageColor, message, icon, iconColor,
+                    borderColor, backgroundColor, expiration, shape, visible);
+        }
+        if (androidTvNotificationsDisplayHandler != null) {
+            return androidTvNotificationsDisplayHandler.sendFixedNotification(messageID, messageColor, message, icon,
+                    iconColor, borderColor, backgroundColor, expiration, shape, visible);
         }
         return false;
     }

@@ -147,14 +147,19 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
                     break;
                 case CHANNEL_SEND_TEST_NOTIFICATION:
                     if (command instanceof OnOffType) {
-                        sendText(9999, "Empowering the smart home", "Congratulations you have a working test message",
+                        sendText("9999", "Empowering the smart home", "Congratulations you have a working test message",
                                 "mdi:home-alert-outline", "mdi:chevron-up-circle-outline", "#f47d2e", null, null);
                     }
                     break;
                 case CHANNEL_SEND_NOTIFICATION:
                     if (command instanceof StringType) {
-                        sendText(9999, command.toString(), null, "mdi:home-alert-outline",
+                        sendText("9999", command.toString(), null, "mdi:home-alert-outline",
                                 "mdi:chevron-up-circle-outline", "#f47d2e", null, null);
+                    }
+                    break;
+                case CHANNEL_PIXEL_SHIFT:
+                    if (command instanceof OnOffType) {
+                        sendPostRequest("/set/settings", "{\"pixelShift\": " + OnOffType.ON.equals(command) + "}");
                     }
                     break;
             }
@@ -233,9 +238,9 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
         return gson.toJson(object);
     }
 
-    public boolean sendText(int messageID, @Nullable String title, @Nullable String message, @Nullable String largeIcon,
-            @Nullable String smallIcon, @Nullable String smallIconColor, @Nullable String corner,
-            @Nullable Integer duration) {
+    public boolean sendText(String messageID, @Nullable String title, @Nullable String message,
+            @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor,
+            @Nullable String corner, @Nullable Integer duration) {
         Notification notification = new Notification(messageID, title, message);
         notification.corner = corner;
         notification.duration = duration;
@@ -246,7 +251,7 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
                 .equals(sendPostRequest("/notify", toJson(notification)));
     }
 
-    public boolean sendVideo(int messageID, @Nullable String title, @Nullable String message, String videoURL,
+    public boolean sendVideo(String messageID, @Nullable String title, @Nullable String message, String videoURL,
             @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor,
             @Nullable String corner, @Nullable Integer duration) {
         Notification notification = new Notification(messageID, title, message);
@@ -268,7 +273,7 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
                 .equals(sendPostRequest("/notify", toJson(notification)));
     }
 
-    public boolean sendImage(int messageID, @Nullable String title, @Nullable String message, String imageURL,
+    public boolean sendImage(String messageID, @Nullable String title, @Nullable String message, String imageURL,
             @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor,
             @Nullable String corner, @Nullable Integer duration) {
         Notification notification = new Notification(messageID, title, message);
@@ -293,5 +298,24 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
         notification.smallIconColor = smallIconColor;
         return "{\"success\":true,\"message\":\"Notification received\"}"
                 .equals(sendPostRequest("/notify", toJson(notification)));
+    }
+
+    public boolean sendFixedNotification(String messageID, @Nullable String messageColor, @Nullable String message,
+            @Nullable String icon, @Nullable String iconColor, @Nullable String borderColor,
+            @Nullable String backgroundColor, @Nullable Integer expiration, @Nullable String shape,
+            @Nullable Boolean visible) {
+        FixedNotification fixedNotification = new FixedNotification();
+        fixedNotification.id = messageID;
+        fixedNotification.messageColor = messageColor;
+        fixedNotification.message = message;
+        fixedNotification.icon = icon;
+        fixedNotification.iconColor = iconColor;
+        fixedNotification.borderColor = borderColor;
+        fixedNotification.backgroundColor = backgroundColor;
+        fixedNotification.expiration = expiration;
+        fixedNotification.shape = shape;
+        fixedNotification.visible = visible;
+        return "{\"success\":true,\"message\":\"Notification received\"}"
+                .equals(sendPostRequest("/notify_fixed", toJson(fixedNotification)));
     }
 }

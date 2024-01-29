@@ -48,6 +48,7 @@
 			<channel id="hotCorner" typeId="hotCorner"/>
 			<channel id="notificationDuration" typeId="notificationDuration"/>
 			<channel id="displayNotifications" typeId="displayNotifications"/>
+			<channel id="pixelShift" typeId="pixelShift"/>
 		</channels>
 
 		<config-description>
@@ -153,7 +154,7 @@
 				<option value="30min">30 Minutes</option>
 				<option value="40min">40 Minutes</option>
 				<option value="50min">50 Minutes</option>
-				<option value="60min">1 Hour</option>				
+				<option value="60min">1 Hour</option>
 			</options>
 		</state>
 	</channel-type>
@@ -162,6 +163,12 @@
 		<item-type>Switch</item-type>
 		<label>Display Fixed Notifications</label>
 		<description>Whether or not the fixed notifications are displayed.</description>
+	</channel-type>
+
+	<channel-type id="pixelShift">
+		<item-type>Switch</item-type>
+		<label>Pixel Shift</label>
+		<description>Whether to move the overlay every 2 minutes to avoid screen burn-in</description>
 	</channel-type>
 
 	<channel-type id="displayNotifications">
@@ -186,7 +193,8 @@
 		<item-type>String</item-type>
 		<label>Send Notification</label>
 		<description>Use this channel to send quick messages by changing the `default list item widget` to
-			`input-list-item`, `text` as input type and enable the send button.</description>
+			`input-list-item`,
+			`text` as input type and enable the send button.</description>
 	</channel-type>
 
 </thing:thing-descriptions>

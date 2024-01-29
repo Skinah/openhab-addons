@@ -56,4 +56,5 @@ public class AndroidNotificationsBindingConstants {
     public static final String CHANNEL_SEND_NOTIFICATION = "sendNotification";
     public static final String CHANNEL_SEND_TEST_NOTIFICATION = "sendTestNotification";
     public static final String CHANNEL_FONT_SIZE = "fontSize";
+    public static final String CHANNEL_PIXEL_SHIFT = "pixelShift";
 }
