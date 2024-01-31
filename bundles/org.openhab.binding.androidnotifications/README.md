@@ -6,11 +6,13 @@ This binding will try to standardize the way you interact with any of the apps, 
 The two supported apps so far are:
 
 + TvOverlay (working well) <https://play.google.com/store/apps/details?id=com.tabdeveloper.tvoverlay&hl=en_AU&gl=US>
+
 + Android TV Notifications (work in progress, Text based messages now work) <https://play.google.com/store/apps/details?id=de.cyberdream.androidtv.notifications.google&hl=en&gl=US>
 
 Other apps which are not yet supported, but could be are:
 
 + Push TV <https://play.google.com/store/apps/details?id=de.andreashuth.pushtv>
+
 + PiPup <https://play.google.com/store/apps/details?id=nl.rogro82.pipup>
 
 ## How to Install and Setup
@@ -41,14 +43,14 @@ You can manually add the thing and provide just the IP address and the setup fro
 
 | Name            | Type    | Description                           | Default | Required | Advanced |
 |-----------------|---------|---------------------------------------|---------|----------|----------|
-| address        | text    | Hostname or IP address of the device  | N/A     | yes      | no       |
+| address         | text    | Hostname or IP address of the device  | N/A     | yes      | no       |
 | port            | number  | Port to access the device             |  5001   | yes      | yes      |
 
 ### `nfatvdisplay` Thing Configuration
 
 | Name            | Type    | Description                           | Default | Required | Advanced |
 |-----------------|---------|---------------------------------------|---------|----------|----------|
-| address        | text    | Hostname or IP address of the device  | N/A     | yes      | no       |
+| address         | text    | Hostname or IP address of the device  | N/A     | yes      | no       |
 | port            | number  | Port to access the device             |  7676   | yes      | yes      |
 
 ## Channels
@@ -130,15 +132,29 @@ For advanced messages you need to use ACTIONS.
 In these examples the `SonyTV` is the UniqueID of the `tvoverlaydisplay` thing.
 Because the duration is not specified in the shorter versions, you can change the length of the time that the message is displayed for, by using the `remote` app on your phone, by starting the app on the TV, or by using the openHAB channel called `notificationDuration`.
 The same can be done with the full methods if you use `null` and provide no value, the app will resort to using the default values for any provided with `null`.
+
 Most of these features have a channel that can be used.
 
+```
 getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:SonyTV").sendVideo("123", "Backyard", "Movement Detected","rtsp://admin:password@192.168.4.6:554/Streaming/Channels/102?transportmode=unicast&profile=Profile_1")
+```
 
+Download a URL locally on openHAB with the binding and then send it to the TV.
+This method reduces lag if you find someone runs through the cameras field of view before the snapshot is taken at the TV.
+
+```
+getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:TheTV").sendImage("Backyard","Backyard" ,"Movement Detected","download:http://192.168.1.2:8080/ipcamera/backyard/ipcamera.jpg")
+```
+
+```
 getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:SonyTV").sendText("124", null, "Frank arrived home")
+```
 
 Any picture files that are in your `openHAB-conf\html` folder can be used by providing the static path.
 
+```
 getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:SonyTV").sendImage("125", "Temperatures", "Graph of all rooms","http://openhab:8080/static/graph.jpg")
+```
 
 The actions will return true or false based on if they succeed.
 You can also cancel long duration messages if you save the ID for use in other rules.
@@ -169,4 +185,10 @@ Display a warning logo that the sprinklers will be running soon to bring any was
 
 ```
 getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:TheTV").sendFixedNotification("SprinklerWarning", null, null,"mdi:sprinkler-variant","62B1F0", "85C3F5", null, 21600, "circle", true)
+```
+
+Example of providing your own icon from a file.
+
+```
+getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:TheTV").sendFixedNotification("RedBin", null, null,"file:/etc/openhab/icons/classic/qualityofservice-1.png",null, null, null, 10, "circle", true)
 ```
