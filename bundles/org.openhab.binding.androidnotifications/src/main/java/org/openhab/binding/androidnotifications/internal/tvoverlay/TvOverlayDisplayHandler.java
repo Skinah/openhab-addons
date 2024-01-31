@@ -354,7 +354,7 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
         if (lowercase.startsWith("file:")) {
             return fileToBase64(image);
         } else if (lowercase.startsWith("download:")) {
-            return downloadToBase64(image.substring(8));
+            return downloadToBase64(image.substring(9));// remove the download:
         } else if (lowercase.startsWith("http")) {
             // prevent cache from using an old image instead up updating every time.
             if (image.contains("?")) {
