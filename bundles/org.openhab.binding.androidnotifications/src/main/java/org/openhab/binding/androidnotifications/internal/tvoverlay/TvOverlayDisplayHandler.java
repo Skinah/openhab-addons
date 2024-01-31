@@ -14,6 +14,12 @@ package org.openhab.binding.androidnotifications.internal.tvoverlay;
 
 import static org.openhab.binding.androidnotifications.internal.AndroidNotificationsBindingConstants.*;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -244,8 +250,12 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
         Notification notification = new Notification(messageID, title, message);
         notification.corner = corner;
         notification.duration = duration;
-        notification.largeIcon = largeIcon;
-        notification.smallIcon = smallIcon;
+        if (largeIcon != null) {
+            notification.largeIcon = handleImage(largeIcon);
+        }
+        if (smallIcon != null) {
+            notification.smallIcon = handleImage(smallIcon);
+        }
         notification.smallIconColor = smallIconColor;
         return "{\"success\":true,\"message\":\"Notification received\"}"
                 .equals(sendPostRequest("/notify", toJson(notification)));
@@ -261,12 +271,12 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
         if (largeIcon == null) {
             notification.largeIcon = "mdi:motion-sensor";
         } else {
-            notification.largeIcon = largeIcon;
+            notification.largeIcon = handleImage(largeIcon);
         }
         if (smallIcon == null) {
             notification.smallIcon = "mdi:cctv";
         } else {
-            notification.smallIcon = smallIcon;
+            notification.smallIcon = handleImage(smallIcon);
         }
         notification.smallIconColor = smallIconColor;
         return "{\"success\":true,\"message\":\"Notification received\"}"
@@ -277,27 +287,83 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
             @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor,
             @Nullable String corner, @Nullable Integer duration) {
         Notification notification = new Notification(messageID, title, message);
-        // prevent cache from using an old image instead up updating every time.
-        if (imageURL.contains("?")) {
-            notification.setImage(imageURL + "&time=" + new Date().getTime());
-        } else {
-            notification.setImage(imageURL + "?time=" + new Date().getTime());
-        }
+        notification.setImage(handleImage(imageURL));
         notification.corner = corner;
         notification.duration = duration;
         if (largeIcon == null) {
             notification.largeIcon = "mdi:image-album";
         } else {
-            notification.largeIcon = largeIcon;
+            notification.largeIcon = handleImage(largeIcon);
         }
         if (smallIcon == null) {
             notification.smallIcon = "mdi:camera";
         } else {
-            notification.smallIcon = smallIcon;
+            notification.smallIcon = handleImage(smallIcon);
         }
         notification.smallIconColor = smallIconColor;
         return "{\"success\":true,\"message\":\"Notification received\"}"
                 .equals(sendPostRequest("/notify", toJson(notification)));
+    }
+
+    private String fileToBase64(String filename) {
+        logger.debug("Reading file from local file system: {}", filename);
+        File file;
+        try {
+            file = Path.of(new URL(filename).getPath()).toFile();
+            FileInputStream fileInputStreamReader;
+            fileInputStreamReader = new FileInputStream(file);
+            byte[] bytes = new byte[(int) file.length()];
+            fileInputStreamReader.read(bytes);
+            fileInputStreamReader.close();
+            return new String(Base64.getEncoder().encode(bytes));
+        } catch (IOException e) {
+            logger.warn("Reading file failed: {}", e.getMessage());
+        }
+        return "";
+    }
+
+    private String downloadToBase64(String filename) {
+        logger.debug("Downloading file from: {}", filename);
+        Request request = httpClient.newRequest(filename).method(HttpMethod.GET).timeout(30, TimeUnit.SECONDS);
+        try {
+            ContentResponse contentResponse = request.send();
+            if (contentResponse.getStatus() == 200) {
+                byte[] fileContent = contentResponse.getContent();
+                return new String(Base64.getEncoder().encode(fileContent));
+            } else {
+                logger.warn("Downloading file failed with {}:{}", contentResponse.getStatus(),
+                        contentResponse.getContentAsString());
+            }
+        } catch (TimeoutException | ExecutionException e) {
+            logger.warn("Downloading file failed: {}", e.getMessage());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.warn("Downloading file failed: {}", e.getMessage());
+        }
+        return "";
+    }
+
+    /**
+     * The {@link handleImage} Will check if it is a local file or the user wants to download a source, then turn it
+     * into a base64 String the API can understand. It also can use a trick to ensure a http/s source always get
+     * downloaded and not fetched from cache.
+     *
+     */
+    private String handleImage(String image) {
+        String lowercase = image.toLowerCase();
+        if (lowercase.startsWith("file:")) {
+            return fileToBase64(image);
+        } else if (lowercase.startsWith("download:")) {
+            return downloadToBase64(image.substring(8));
+        } else if (lowercase.startsWith("http")) {
+            // prevent cache from using an old image instead up updating every time.
+            if (image.contains("?")) {
+                return image + "&time=" + new Date().getTime();
+            } else {
+                return image + "?time=" + new Date().getTime();
+            }
+        }
+        return image;
     }
 
     public boolean sendFixedNotification(String messageID, @Nullable String messageColor, @Nullable String message,
@@ -308,13 +374,15 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
         fixedNotification.id = messageID;
         fixedNotification.messageColor = messageColor;
         fixedNotification.message = message;
-        fixedNotification.icon = icon;
         fixedNotification.iconColor = iconColor;
         fixedNotification.borderColor = borderColor;
         fixedNotification.backgroundColor = backgroundColor;
         fixedNotification.expiration = expiration;
         fixedNotification.shape = shape;
         fixedNotification.visible = visible;
+        if (icon != null) {
+            fixedNotification.icon = handleImage(icon);
+        }
         return "{\"success\":true,\"message\":\"Notification received\"}"
                 .equals(sendPostRequest("/notify_fixed", toJson(fixedNotification)));
     }

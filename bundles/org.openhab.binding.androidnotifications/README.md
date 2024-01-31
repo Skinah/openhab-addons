@@ -67,7 +67,23 @@ Not yet fully documented, just use the main UI to see what is available, and rea
 | displayCorner             | String    | RW         | Change which corner of the screen the messages and clock get displayed in. Values 0-4 |
 | notificationDuration      | Number:Time | RW       | Change the default amount of time the messages get displayed for if `null` is used in a message |
 | displayNotifications      | Switch    | RW         | Show or hide any normal non fixed type notifications |
-| fontSize                  | String    | RW         | Size of the font, value 0 to 4 |       
+| fontSize                  | String    | RW         | Size of the font, value 0 to 4 |
+
+## TvOverlay Fixed Notifications
+
+The icon and imageUrl fields needs some extra info, as the binding can do some extra stuff above the raw TvOverlay API.
+You can send icons and images in the following formats:
+
++ `mdi:trash-can-outline` Any text that starts with `mdi:` will get passed on and you can send the name of any MDI icon from a [searchable website](https://pictogrammers.com/library/mdi/)
+
++ `https://picsum.photos/300/300` Any text with http or https will get passed on and get downloaded by the TV so there may be a delay while the TV downloads the image which is slower than openHAB doing the processing.
+
++ `download:https://picsum.photos/300/300` If it starts with `download:` the http or https URL will get downloaded by the binding and then passed on as base64.
+This can avoid a delay where the TV downloads the image which is slower than openHAB doing the processing.
+
++ `file:/etc/openhab/icons/classic/qualityofservice-1.png` A path on mac or linux that will be sent as base64.
+
++ `file:c:\\foo\\qualityofservice-1.png` Path for a windows locations that will be sent as base64.
 
 ## Actions
 
@@ -140,9 +156,17 @@ var result = getActions("androidnotifications", "androidnotifications:tvoverlayd
 ## Fixed Notification Examples
 
 Display a logo of which coloured bin needs to get taken out to the street.
+
+```
 getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:TheTV").sendFixedNotification("YellowBin", null, null,"mdi:trash-can-outline","FEEA3C", "FCEF7B", null, 21600, "circle", true)
+```
 
+```
 getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:TheTV").sendFixedNotification("RedBin", null, null,"mdi:trash-can-outline","E13D3A", "EA6E6B", null, 21600, "circle", true)
+```
 
-Display a warning logo that the sprinklers will be running soon to bring washing inside.
+Display a warning logo that the sprinklers will be running soon to bring any washing inside.
+
+```
 getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:TheTV").sendFixedNotification("SprinklerWarning", null, null,"mdi:sprinkler-variant","62B1F0", "85C3F5", null, 21600, "circle", true)
+```
