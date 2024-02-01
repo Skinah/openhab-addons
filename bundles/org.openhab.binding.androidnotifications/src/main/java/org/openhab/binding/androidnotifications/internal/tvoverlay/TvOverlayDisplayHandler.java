@@ -71,7 +71,7 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
     private @Nullable ScheduledFuture<?> pollingFuture = null;
     private TvOverlayDisplayConfiguration config = new TvOverlayDisplayConfiguration();
     public String baseUrlAndPort = "";
-    private Map<String, Notification> waitingNotifications = new HashMap<>();
+    // private Map<String, Notification> waitingNotifications = new HashMap<>();
     private Map<String, FixedNotification> waitingFixedNotifications = new HashMap<>();
 
     public TvOverlayDisplayHandler(Thing thing, HttpClient httpClient) {
@@ -98,6 +98,7 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
             future.cancel(true);
             pollingFuture = null;
         }
+        waitingFixedNotifications.clear();
     }
 
     private void pollState() {
@@ -108,6 +109,7 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
                 for (FixedNotification fixedNotification : waitingFixedNotifications.values()) {
                     sendPostRequest("/notify_fixed", toJson(fixedNotification));
                 }
+                waitingFixedNotifications.clear();
             }
         } else {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, result);
