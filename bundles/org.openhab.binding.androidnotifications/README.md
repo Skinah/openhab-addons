@@ -1,4 +1,4 @@
-# AndroidNotifications Binding
+# Android Notifications Binding
 
 This binding can talk with more then 1 Google Play Store app, you only need one of them not both.
 This binding will try to standardize the way you interact with any of the apps, so if one app disappears, gets buggy, gets caught sending data back home, or excessively nags with ads, you can switch to one of the others with minimal changes to openHAB.
@@ -170,6 +170,19 @@ var result = getActions("androidnotifications", "androidnotifications:tvoverlayd
 ```
 
 ## Fixed Notification Examples
+
+
+Advanced rule to show how you can cancel a fixed notification because the TV was turned off.
+You can remove single fixed notifications this way, or turn off the resending of all fixed notification with the config `resendFixed`.
+
+```
+var messageID="KettleBoiled"
+var result = getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:TheTV").sendFixedNotification(messageID, null, null,"mdi:kettle-steam-outline","E13D3A", "EA6E6B", null, 300, "circle", true)
+  if(!result){
+    sendLogNotification("Kettle is now hot but as TV is off no point displaying this when the kettle is cold.")
+    getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:TheTV").sendFixedNotification(messageID, null, null,"mdi:kettle-steam-outline","E13D3A", "EA6E6B", null, 300, "circle", false) //false removes this so will not display
+  }
+```
 
 Display a logo of which coloured bin needs to get taken out to the street.
 

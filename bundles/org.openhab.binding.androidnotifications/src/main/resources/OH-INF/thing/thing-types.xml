@@ -30,6 +30,11 @@
 				<default>7676</default>
 				<advanced>true</advanced>
 			</parameter>
+			<parameter name="pollTime" type="integer" min="5" unit="s" required="true">
+				<label>Poll Time</label>
+				<description>Time in seconds of how often to fetch the state of any settings and check if TV is turned on.</description>
+				<default>60</default>
+			</parameter>
 		</config-description>
 	</thing-type>
 
@@ -57,12 +62,23 @@
 				<label>Address</label>
 				<description>Enter just the IP or Hostname without the port or http/s</description>
 			</parameter>
+			<parameter name="resendFixed" type="boolean">
+				<label>Resend Fixed Notifications</label>
+				<description>If set, will automatically re-send any fixed notifications when the TV comes back online. You can
+					remove individual messages so they are not sent with visible=false and same ID.</description>
+				<default>true</default>
+			</parameter>
 			<parameter name="port" type="integer" required="true" min="1" max="65535">
 				<label>Port</label>
 				<description>This port will be used for sending messages to your TV.
 				</description>
 				<default>5001</default>
 				<advanced>true</advanced>
+			</parameter>
+			<parameter name="pollTime" type="integer" min="5" unit="s" required="true">
+				<label>Poll Time</label>
+				<description>Time in seconds of how often to fetch the state of any settings and check if TV is turned on.</description>
+				<default>60</default>
 			</parameter>
 		</config-description>
 	</thing-type>

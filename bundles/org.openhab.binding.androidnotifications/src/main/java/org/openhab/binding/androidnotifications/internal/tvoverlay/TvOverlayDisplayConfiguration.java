@@ -22,5 +22,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 @NonNullByDefault
 public class TvOverlayDisplayConfiguration {
     public String address = "";
-    public int port = 0;
+    public int port;
+    public int pollTime;
+    public boolean resendFixed;
 }

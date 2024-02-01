@@ -23,7 +23,11 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -43,6 +47,7 @@ import org.openhab.core.library.unit.Units;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingStatus;
+import org.openhab.core.thing.ThingStatusDetail;
 import org.openhab.core.thing.binding.BaseThingHandler;
 import org.openhab.core.thing.binding.ThingHandlerService;
 import org.openhab.core.types.Command;
@@ -63,8 +68,11 @@ import com.google.gson.GsonBuilder;
 public class TvOverlayDisplayHandler extends BaseThingHandler {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final HttpClient httpClient;
+    private @Nullable ScheduledFuture<?> pollingFuture = null;
     private TvOverlayDisplayConfiguration config = new TvOverlayDisplayConfiguration();
     public String baseUrlAndPort = "";
+    private Map<String, Notification> waitingNotifications = new HashMap<>();
+    private Map<String, FixedNotification> waitingFixedNotifications = new HashMap<>();
 
     public TvOverlayDisplayHandler(Thing thing, HttpClient httpClient) {
         super(thing);
@@ -75,12 +83,35 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
     public void initialize() {
         config = getConfigAs(TvOverlayDisplayConfiguration.class);
         if (config.address.contains("://")) {
-            logger.warn("Address needs to be a pure IP or hostname that does not include http/s");
+            logger.warn("Address should be a pure IP or hostname that does not include http/s");
             baseUrlAndPort = config.address + ":" + config.port;
         } else {
             baseUrlAndPort = "http://" + config.address + ":" + config.port;
         }
-        updateStatus(ThingStatus.ONLINE);
+        pollingFuture = scheduler.scheduleWithFixedDelay(this::pollState, 0, config.pollTime, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public void dispose() {
+        Future<?> future = pollingFuture;
+        if (future != null) {
+            future.cancel(true);
+            pollingFuture = null;
+        }
+    }
+
+    private void pollState() {
+        String result = sendGetRequest("/get");
+        if (result.startsWith("{\"success\":true")) {
+            updateStatus(ThingStatus.ONLINE);
+            if (!waitingFixedNotifications.isEmpty()) {
+                for (FixedNotification fixedNotification : waitingFixedNotifications.values()) {
+                    sendPostRequest("/notify_fixed", toJson(fixedNotification));
+                }
+            }
+        } else {
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, result);
+        }
     }
 
     @Override
@@ -383,7 +414,13 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
         if (icon != null) {
             fixedNotification.icon = handleImage(icon);
         }
-        return "{\"success\":true,\"message\":\"Notification received\"}"
+        boolean sent = "{\"success\":true,\"message\":\"Notification received\"}"
                 .equals(sendPostRequest("/notify_fixed", toJson(fixedNotification)));
+        if (!sent && visible != null && visible == false) {
+            waitingFixedNotifications.remove(messageID);
+        } else if (!sent && config.resendFixed) {
+            waitingFixedNotifications.put(messageID, fixedNotification);
+        }
+        return sent;
     }
 }

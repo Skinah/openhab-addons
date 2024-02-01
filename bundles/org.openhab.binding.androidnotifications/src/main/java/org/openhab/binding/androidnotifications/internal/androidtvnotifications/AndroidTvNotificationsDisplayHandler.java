@@ -30,6 +30,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -53,6 +55,7 @@ import org.openhab.core.library.types.StringType;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingStatus;
+import org.openhab.core.thing.ThingStatusDetail;
 import org.openhab.core.thing.binding.BaseThingHandler;
 import org.openhab.core.thing.binding.ThingHandlerService;
 import org.openhab.core.types.Command;
@@ -81,6 +84,7 @@ import io.netty.handler.timeout.IdleStateHandler;
 public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final HttpClient httpClient;
+    private @Nullable ScheduledFuture<?> pollingFuture = null;
     private EventLoopGroup serversLoopGroup = new NioEventLoopGroup();
     private @Nullable ServerBootstrap serverBootstrap;
     private @Nullable ChannelFuture serverFuture = null;
@@ -635,13 +639,27 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
         } else {
             baseUrlAndPort = "http://" + config.address + ":" + config.port;
         }
-        updateStatus(ThingStatus.ONLINE);
         startStreamServer(true);
+        pollingFuture = scheduler.scheduleWithFixedDelay(this::pollState, 0, config.pollTime, TimeUnit.SECONDS);
     }
 
     @Override
     public void dispose() {
         startStreamServer(false);
+        Future<?> future = pollingFuture;
+        if (future != null) {
+            future.cancel(true);
+            pollingFuture = null;
+        }
+    }
+
+    private void pollState() {
+        String result = sendGetRequest("/available");
+        if (result.startsWith("OK")) {
+            updateStatus(ThingStatus.ONLINE);
+        } else {
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, result);
+        }
     }
 
     @Override
