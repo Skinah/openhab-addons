@@ -62,7 +62,7 @@
 				<label>Address</label>
 				<description>Enter just the IP or Hostname without the port or http/s</description>
 			</parameter>
-			<parameter name="resendFixed" type="boolean">
+			<parameter name="resendFixed" type="boolean" required="true">
 				<label>Resend Fixed Notifications</label>
 				<description>If set, will automatically re-send any fixed notifications when the TV comes back online. You can
 					remove individual messages so they are not sent with visible=false and same ID.</description>

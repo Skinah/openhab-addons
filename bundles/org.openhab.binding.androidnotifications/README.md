@@ -1,19 +1,23 @@
 # Android Notifications Binding
 
-This binding can talk with more then 1 Google Play Store app, you only need one of them not both.
+This binding can talk with more then 1 Google Play Store app, you only need to install the one of your choice.
 This binding will try to standardize the way you interact with any of the apps, so if one app disappears, gets buggy, gets caught sending data back home, or excessively nags with ads, you can switch to one of the others with minimal changes to openHAB.
+
+To achieve this goal the other advantage will be that you do not need to learn the API of the app yourself, and can be sending notifications much faster.
 
 The two supported apps so far are:
 
 + TvOverlay (working well) <https://play.google.com/store/apps/details?id=com.tabdeveloper.tvoverlay&hl=en_AU&gl=US>
 
-+ Android TV Notifications (work in progress, Text based messages now work) <https://play.google.com/store/apps/details?id=de.cyberdream.androidtv.notifications.google&hl=en&gl=US>
++ Android TV Notifications (work in progress, only text based messages work for now) <https://play.google.com/store/apps/details?id=de.cyberdream.androidtv.notifications.google&hl=en&gl=US>
 
 Other apps which are not yet supported, but could be are:
 
-+ Push TV <https://play.google.com/store/apps/details?id=de.andreashuth.pushtv>
-
 + PiPup <https://play.google.com/store/apps/details?id=nl.rogro82.pipup>
+
++ Push TV (might be cloud based and not local like the others) <https://play.google.com/store/apps/details?id=de.andreashuth.pushtv>
+
++ Gotify This will push fully locally to phones.
 
 ## How to Install and Setup
 
@@ -45,6 +49,8 @@ You can manually add the thing and provide just the IP address and the setup fro
 |-----------------|---------|---------------------------------------|---------|----------|----------|
 | address         | text    | Hostname or IP address of the device  | N/A     | yes      | no       |
 | port            | number  | Port to access the device             |  5001   | yes      | yes      |
+| pollTime        | number  | Amount of seconds between polling TV  |   6     | yes      | no       |
+| resendFixed     | boolean | Store fixed notifications until ONLINE| true    | yes      | no       |
 
 ### `nfatvdisplay` Thing Configuration
 
@@ -52,8 +58,9 @@ You can manually add the thing and provide just the IP address and the setup fro
 |-----------------|---------|---------------------------------------|---------|----------|----------|
 | address         | text    | Hostname or IP address of the device  | N/A     | yes      | no       |
 | port            | number  | Port to access the device             |  7676   | yes      | yes      |
+| pollTime        | number  | Amount of seconds between polling TV  |   6     | yes      | no       |
 
-## Channels
+## TvOverlay Channels
 
 Not yet fully documented, just use the main UI to see what is available, and read the descriptions in the UI until I find the time to add them here.
 
@@ -70,18 +77,20 @@ Not yet fully documented, just use the main UI to see what is available, and rea
 | notificationDuration      | Number:Time | RW       | Change the default amount of time the messages get displayed for if `null` is used in a message |
 | displayNotifications      | Switch    | RW         | Show or hide any normal non fixed type notifications |
 | fontSize                  | String    | RW         | Size of the font, value 0 to 4 |
+| pixelShift                | Switch    | RW         | Tells the TV to shift the fixed notifications around a few pixels every minute to prevent burn-in |
 
 ## TvOverlay Fixed Notifications
 
-The icon and imageUrl fields needs some extra info, as the binding can do some extra stuff above the raw TvOverlay API.
+The icon and imageUrl fields need some extra explaining, as the binding has extra abilities above the raw TvOverlay API.
 You can send icons and images in the following formats:
 
 + `mdi:trash-can-outline` Any text that starts with `mdi:` will get passed on and you can send the name of any MDI icon from a [searchable website](https://pictogrammers.com/library/mdi/)
 
-+ `https://picsum.photos/300/300` Any text with http or https will get passed on and get downloaded by the TV so there may be a delay while the TV downloads the image which is slower than openHAB doing the processing.
++ `https://picsum.photos/300/300` Any text with http or https will get passed on and get downloaded by the TV, so there may be a delay while the TV downloads the image.
 
-+ `download:https://picsum.photos/300/300` If it starts with `download:` the http or https URL will get downloaded by the binding and then passed on as base64.
-This can avoid a delay where the TV downloads the image which is slower than openHAB doing the processing.
++ `download:https://picsum.photos/300/300` If it starts with `download:` the http or https URL will get downloaded by the binding, and then passed on as base64.
+This can avoid a delay where the TV downloads the image which is further away from the triggering event.
+You may find this allows a camera to pass on the image of a running person before they run out of view.
 
 + `file:/etc/openhab/icons/classic/qualityofservice-1.png` A path on mac or linux that will be sent as base64.
 
@@ -169,7 +178,7 @@ var result = getActions("androidnotifications", "androidnotifications:tvoverlayd
   }
 ```
 
-## Fixed Notification Examples
+## TvOverlay Fixed Notification Examples
 
 
 Advanced rule to show how you can cancel a fixed notification because the TV was turned off.
@@ -187,11 +196,15 @@ var result = getActions("androidnotifications", "androidnotifications:tvoverlayd
 Display a logo of which coloured bin needs to get taken out to the street.
 
 ```
-getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:TheTV").sendFixedNotification("YellowBin", null, null,"mdi:trash-can-outline","FEEA3C", "FCEF7B", null, 21600, "circle", true)
-```
-
-```
-getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:TheTV").sendFixedNotification("RedBin", null, null,"mdi:trash-can-outline","E13D3A", "EA6E6B", null, 21600, "circle", true)
+var dayYear = now.getDayOfYear
+var dayModulus = dayYear%7 //account for when year does not start on the same day of the week as today.
+var weekNumber =(dayYear-dayModulus)/7
+logInfo("BinTvIconRule", "{} Weeks into the year",weekNumber)
+  if( weekNumber % 2 == 0) {//Even number of weeks
+    getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:TheTV").sendFixedNotification("RedBin", null, null,"mdi:trash-can-outline","E13D3A", "EA6E6B", null, 54000, "circle", true)
+  }else{//54000 = 15 hours
+    getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:TheTV").sendFixedNotification("YellowBin", null, null,"mdi:trash-can-outline","FEEA3C", "FCEF7B", null, 54000, "circle", true)
+  }
 ```
 
 Display a warning logo that the sprinklers will be running soon to bring any washing inside.
@@ -200,8 +213,8 @@ Display a warning logo that the sprinklers will be running soon to bring any was
 getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:TheTV").sendFixedNotification("SprinklerWarning", null, null,"mdi:sprinkler-variant","62B1F0", "85C3F5", null, 21600, "circle", true)
 ```
 
-Example of providing your own icon from a file.
+Example of providing your own icon from a file on the Linux file system.
 
 ```
-getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:TheTV").sendFixedNotification("RedBin", null, null,"file:/etc/openhab/icons/classic/qualityofservice-1.png",null, null, null, 10, "circle", true)
+getActions("androidnotifications", "androidnotifications:tvoverlaydisplay:TheTV").sendFixedNotification("WhiteWifi", null, null,"file:/etc/openhab/icons/classic/qualityofservice-1.png","ffffff", null, null, 10, "circle", true)
 ```

@@ -27,9 +27,8 @@ import org.openhab.core.thing.ThingTypeUID;
  */
 @NonNullByDefault
 public class AndroidNotificationsBindingConstants {
-
     public static final String BINDING_ID = "androidnotifications";
-    public static final int HTTP_TIMEOUT_SECONDS = 10;
+    public static final int HTTP_TIMEOUT_SECONDS = 5;
 
     // List of all Things and Thing Types
     public static final String NFATV_DISPLAY_THING = "nfatvdisplay";
