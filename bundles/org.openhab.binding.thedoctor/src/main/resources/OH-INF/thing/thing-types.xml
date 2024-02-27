@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thing:thing-descriptions bindingId="thedoctor"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:thing="https://openhab.org/schemas/thing-description/v1.0.0"
+	xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
+
+	<thing-type id="doctor">
+		<label>The Doctor</label>
+		<description>Give your system a health check up with this thing</description>
+
+		<channels>
+			<channel id="cleaned-heap-percent" typeId="cleaned-heap-percent"/>
+		</channels>
+
+		<config-description>
+			<parameter name="refresh" type="integer" unit="s" min="10">
+				<label>Refresh Interval</label>
+				<description>Interval the systems health is polled in sec.</description>
+				<default>15</default>
+				<advanced>true</advanced>
+			</parameter>
+		</config-description>
+	</thing-type>
+
+	<channel-type id="cleaned-heap-percent">
+		<item-type>Number:Dimensionless</item-type>
+		<label>Cleaned Heap Percent</label>
+		<description>How much data in percent remains in the heap after garbage collection has been done.</description>
+		<state pattern="%.1f %%" readOnly="true"/>
+	</channel-type>
+</thing:thing-descriptions>
