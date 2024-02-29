@@ -14,6 +14,8 @@ package org.openhab.binding.thedoctor.internal;
 
 import static org.openhab.binding.thedoctor.internal.TheDoctorBindingConstants.CHANNEL_CLEANED_HEAP;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -45,8 +47,12 @@ public class TheDoctorHandler extends BaseThingHandler {
     private TheDoctorConfiguration config = new TheDoctorConfiguration();
     private @Nullable ScheduledFuture<?> pollingFuture = null;
     private @Nullable ScheduledFuture<?> longPollingFuture = null;
+    private LocalDateTime startDateTime = LocalDateTime.now();
+    private long days = 0;
     private long refHeap = 0;
     private long maxHeap = 0;
+    private long maxRam = 0;
+    private double maxTemp = 0;
     SystemInfo systemInfo = new SystemInfo();
 
     public TheDoctorHandler(Thing thing) {
@@ -57,7 +63,6 @@ public class TheDoctorHandler extends BaseThingHandler {
     public void handleCommand(ChannelUID channelUID, Command command) {
     }
 
-    // Check every 15 seconds so as not to miss the garbage collection by too much time.
     private long checkHeap(boolean clean) {
         if (clean) {
             System.gc();
@@ -66,6 +71,7 @@ public class TheDoctorHandler extends BaseThingHandler {
             Thread.sleep(500);
         } catch (InterruptedException e) {
         }
+        // maxMemory is the -Xmx value, totalMemory is the heaps allocated size which can be lower.
         return (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) * 100
                 / Runtime.getRuntime().maxMemory();
     }
@@ -74,42 +80,74 @@ public class TheDoctorHandler extends BaseThingHandler {
         long cleanedHeap = checkHeap(true);
         if (refHeap == 0) {
             refHeap = cleanedHeap;
-        } else if (cleanedHeap > refHeap + 3) {
+            if (cleanedHeap < 20) {
+                logger.info(
+                        "You have a bigger heap size then needed as it is only {}% full after garbage collection. Consider decreasing your Java -Xmx size",
+                        cleanedHeap);
+            }
+        } else if (cleanedHeap > refHeap + 4) {
             logger.warn("Heap has increased from {} to {} and may indicate a memory leak if this number keeps growing",
                     refHeap, cleanedHeap);
         }
         updateState(CHANNEL_CLEANED_HEAP, new QuantityType<>(cleanedHeap, Units.PERCENT));
+        LocalDateTime now = LocalDateTime.now();
+        long diff = ChronoUnit.DAYS.between(startDateTime, now);
+        if (diff > days) {
+            days = diff;
+            // reset the max variables so each day you get the warnings again
+            maxHeap = 0;
+            maxRam = 0;
+            maxTemp = 0;
+        }
     }
 
     private void checkHealth() {
         long totalPhysicalMemory = systemInfo.getHardware().getMemory().getTotal();
         long availableMemory = systemInfo.getHardware().getMemory().getAvailable();
-        long ram = availableMemory * 100 / totalPhysicalMemory;
+        long ram = (totalPhysicalMemory - availableMemory) * 100 / totalPhysicalMemory;// % Used
+        long heap = checkHeap(false);
+        if (heap > maxHeap) {
+            maxHeap = heap;
+            if (heap > 95) {
+                logger.warn("BAD : Heap is {}% full, consider increasing your Java -Xmx size", heap);
+            }
+        }
+        logger.debug("GOOD: Heap is only {}% full, and ranges from {}% to {}%", heap, refHeap, maxHeap);
         if (ram > 80) {
-            logger.info("BAD : Available RAM is {}% Free", ram);
+            if (ram > maxRam) {
+                maxRam = ram;
+                if (maxHeap < 80) {
+                    logger.info(
+                            "BAD : RAM is now {}% full but you have a bigger heap size then is needed, consider decreasing your Java -Xmx size",
+                            ram);
+                } else {
+                    logger.info("BAD : RAM is now {}% full", ram);
+                }
+            } else {
+                logger.debug("BAD : RAM is now {}% full", ram);
+            }
         } else {
-            logger.debug("GOOD: Available RAM is {}% Free", ram);
+            logger.debug("GOOD: RAM is {}% full", ram);
         }
 
         double temperature = systemInfo.getHardware().getSensors().getCpuTemperature();
         // throttles occur at pi3 70, pi4 82
         if (temperature > 60) {
-            logger.warn("BAD : CPU temperature is {} and may cause instability. Do you have a heatsink and fan?",
-                    temperature);
+            if (temperature > maxTemp) {
+                maxTemp = temperature;
+                logger.warn("BAD : CPU temperature is {} and may cause instability. Do you have a heatsink and fan?",
+                        temperature);
+            } else {
+                logger.debug("BAD : CPU temperature is {} and may cause instability. Do you have a heatsink and fan?",
+                        temperature);
+            }
+        } else {
+            logger.debug("GOOD: CPU temperature is {}", temperature);
         }
         double cpuVoltage = systemInfo.getHardware().getSensors().getCpuVoltage();
         if (cpuVoltage > 0) {
             logger.debug("GOOD: CPU voltage is {}Volts", cpuVoltage);
         }
-
-        long heap = checkHeap(false);
-        if (heap > maxHeap) {
-            maxHeap = heap;
-            if (heap > 95) {
-                logger.warn("BAD : Heap is {}%, consider increasing your -Xmx size", heap);
-            }
-        }
-        logger.debug("GOOD: Heap is {}% and ranges from {}% to {}%", heap, refHeap, maxHeap);
     }
 
     @Override
