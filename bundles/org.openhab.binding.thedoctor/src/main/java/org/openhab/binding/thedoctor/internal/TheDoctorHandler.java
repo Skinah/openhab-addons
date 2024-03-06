@@ -91,8 +91,12 @@ public class TheDoctorHandler extends BaseThingHandler {
         }
         updateState(CHANNEL_CLEANED_HEAP, new QuantityType<>(cleanedHeap, Units.PERCENT));
         LocalDateTime now = LocalDateTime.now();
+        int processes = systemInfo.getOperatingSystem().getProcessCount();
+        int threads = Thread.activeCount();
+        logger.debug("Process/Task count {}", processes);
+        logger.debug("Thread count {}", threads);
         long diff = ChronoUnit.DAYS.between(startDateTime, now);
-        if (diff > days) {
+        if (diff > days) {// Another 24 hours has passed since binding started.
             days = diff;
             // reset the max variables so each day you get the warnings again
             maxHeap = 0;
@@ -118,7 +122,7 @@ public class TheDoctorHandler extends BaseThingHandler {
                 maxRam = ram;
                 if (maxHeap < 80) {
                     logger.info(
-                            "BAD : RAM is now {}% full but you have a bigger heap size then is needed, consider decreasing your Java -Xmx size",
+                            "BAD : RAM is now {}% full, but you can improve that by decreasing your Java -Xmx size as your heap appears to be larger than needed.",
                             ram);
                 } else {
                     logger.info("BAD : RAM is now {}% full", ram);
@@ -135,14 +139,14 @@ public class TheDoctorHandler extends BaseThingHandler {
         if (temperature > 60) {
             if (temperature > maxTemp) {
                 maxTemp = temperature;
-                logger.warn("BAD : CPU temperature is {} and may cause instability. Do you have a heatsink and fan?",
+                logger.warn("BAD : CPU temperature is {}c and may cause instability. Do you have a heatsink and fan?",
                         temperature);
             } else {
-                logger.debug("BAD : CPU temperature is {} and may cause instability. Do you have a heatsink and fan?",
+                logger.debug("BAD : CPU temperature is {}c and may cause instability. Do you have a heatsink and fan?",
                         temperature);
             }
         } else {
-            logger.debug("GOOD: CPU temperature is {}", temperature);
+            logger.debug("GOOD: CPU temperature is {}c", temperature);
         }
         double cpuVoltage = systemInfo.getHardware().getSensors().getCpuVoltage();
         if (cpuVoltage > 0) {
@@ -156,7 +160,7 @@ public class TheDoctorHandler extends BaseThingHandler {
         config = getConfigAs(TheDoctorConfiguration.class);
         updateStatus(ThingStatus.ONLINE);
         ProcessorIdentifier processorIdentifier = systemInfo.getHardware().getProcessor().getProcessorIdentifier();
-        logger.info("The processor is :{}", processorIdentifier.getIdentifier());
+        logger.info("The processor is:{}", processorIdentifier.getIdentifier());
         pollingFuture = scheduler.scheduleWithFixedDelay(this::checkHealth, 0, config.refresh, TimeUnit.SECONDS);
         longPollingFuture = scheduler.scheduleWithFixedDelay(this::longCheck, 1, 30, TimeUnit.MINUTES);
     }
