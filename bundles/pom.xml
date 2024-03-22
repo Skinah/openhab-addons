@@ -110,12 +110,7 @@
     <module>org.openhab.binding.digitalstrom</module>
     <module>org.openhab.binding.dlinksmarthome</module>
     <module>org.openhab.binding.dmx</module>
-<<<<<<< HEAD
-
     <module>org.openhab.binding.dolbycp</module>
-
-=======
->>>>>>> 5795964170 (add to pom)
     <module>org.openhab.binding.dominoswiss</module>
     <module>org.openhab.binding.doorbird</module>
     <module>org.openhab.binding.draytonwiser</module>
@@ -167,13 +162,9 @@
     <module>org.openhab.binding.globalcache</module>
     <module>org.openhab.binding.gpstracker</module>
     <module>org.openhab.binding.gree</module>
-<<<<<<< HEAD
     <module>org.openhab.binding.groheondus</module>
     <module>org.openhab.binding.groupepsa</module>
     <module>org.openhab.binding.growatt</module>
-
-=======
->>>>>>> 5795964170 (add to pom)
     <module>org.openhab.binding.groupepsa</module>
     <module>org.openhab.binding.groheondus</module>
     <module>org.openhab.binding.guntamatic</module>
@@ -261,10 +252,7 @@
     <module>org.openhab.binding.modbus.e3dc</module>
     <module>org.openhab.binding.modbus.sbc</module>
     <module>org.openhab.binding.modbus.studer</module>
-<<<<<<< HEAD
     <module>org.openhab.binding.modbus.sungrow</module>
-=======
->>>>>>> 5795964170 (add to pom)
     <module>org.openhab.binding.modbus.sunspec</module>
     <module>org.openhab.binding.modbus.stiebeleltron</module>
     <module>org.openhab.binding.modbus.helioseasycontrols</module>
@@ -338,14 +326,7 @@
     <module>org.openhab.binding.pushsafer</module>
     <module>org.openhab.binding.qbus</module>
     <module>org.openhab.binding.qolsysiq</module>
-<<<<<<< HEAD
-<<<<<<< HEAD
     <module>org.openhab.binding.radiobrowser</module>
-=======
-
->>>>>>> bcef05ee04 (First commit)
-=======
->>>>>>> 5795964170 (add to pom)
     <module>org.openhab.binding.radiothermostat</module>
     <module>org.openhab.binding.regoheatpump</module>
     <module>org.openhab.binding.revogi</module>
@@ -473,14 +454,7 @@
     <module>org.openhab.voice.marytts</module>
     <module>org.openhab.voice.mimictts</module>
     <module>org.openhab.voice.picotts</module>
-<<<<<<< HEAD
-<<<<<<< HEAD
     <module>org.openhab.voice.pipertts</module>
-=======
-        
->>>>>>> bcef05ee04 (First commit)
-=======
->>>>>>> 5795964170 (add to pom)
     <module>org.openhab.voice.pollytts</module>
     <module>org.openhab.voice.rustpotterks</module>
     <module>org.openhab.voice.voicerss</module>
