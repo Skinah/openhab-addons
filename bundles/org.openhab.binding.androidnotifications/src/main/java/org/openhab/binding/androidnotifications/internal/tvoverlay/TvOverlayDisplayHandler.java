@@ -357,7 +357,8 @@ public class TvOverlayDisplayHandler extends BaseThingHandler {
 
     private String downloadToBase64(String filename) {
         logger.debug("Downloading file from: {}", filename);
-        Request request = httpClient.newRequest(filename).method(HttpMethod.GET).timeout(30, TimeUnit.SECONDS);
+        Request request = httpClient.newRequest(filename).method(HttpMethod.GET).timeout(HTTP_TIMEOUT_SECONDS,
+                TimeUnit.SECONDS);
         try {
             ContentResponse contentResponse = request.send();
             if (contentResponse.getStatus() == 200) {

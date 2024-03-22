@@ -15,7 +15,9 @@ package org.openhab.binding.androidnotifications.internal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.core.config.discovery.mdns.MDNSDiscoveryParticipant;
 import org.openhab.core.io.net.http.HttpClientFactory;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * The {@link FireTvDiscoveryService} Discovers and adds any Fire TV devices found that have the
@@ -27,7 +29,8 @@ import org.osgi.service.component.annotations.Component;
 @Component(service = MDNSDiscoveryParticipant.class, immediate = true, configurationPid = "discovery.androidnotifications")
 public class FireTvDiscoveryService extends AndroidNotificationsDiscoveryService {
 
-    public FireTvDiscoveryService(HttpClientFactory httpClientFactory) {
+    @Activate
+    public FireTvDiscoveryService(@Reference HttpClientFactory httpClientFactory) {
         super(httpClientFactory);
     }
 

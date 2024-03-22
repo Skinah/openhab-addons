@@ -45,6 +45,7 @@ import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.client.util.ByteBufferContentProvider;
 import org.eclipse.jetty.client.util.MultiPartContentProvider;
 import org.eclipse.jetty.client.util.StringContentProvider;
+import org.eclipse.jetty.http.HttpFields;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpMethod;
 import org.openhab.binding.androidnotifications.internal.StreamServerHandler;
@@ -138,7 +139,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
         return errorReason;
     }
 
-    public String sendPostRequest(String url, String content) {
+    private String sendPostRequest(String url, String content) {
         Request request;
         String errorReason = "";
 
@@ -173,98 +174,69 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
         return errorReason;
     }
 
-    public String sendRAWPostRequest() {
-        // byte[] bytes = "Hello, World!".getBytes("UTF-8");
-        String encoded = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGP6zwAAAgcBApocMXEAAAAASUVORK5CYII="; // =
-                                                                                                                         // Base64.getEncoder().encodeToString(bytes);
-        // String encoded =
-        // "\"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGP6zwAAAgcBApo\"\r\n"
-        // + "\"cMXEAAAAASUVORK5CYII=\"\r\n" + " ";
-        byte[] decoded = Base64.getDecoder().decode(encoded);
-        String content = "--myBoundary\r\n"
-                + "Content-Disposition: form-data; name=\"filename\"; filename=\"icon.png\"\r\n"
-                + "Content-Type: application/octet-stream" + "\r\n" + "Expires: 0\r\n" + "\r\n"
-                + "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGP6zwAAAgcBApocMXEAAAAASUVORK5CYII="
-                + "\r\n" + "--myBoundary" + "\r\n" + "Content-Disposition: form-data; name=\"msg\"; filename=\"msg\""
-                + "\r\n" + "\r\n" + "Tell me if this works please" + "\r\n" + "--myBoundary" + "\r\n"
-                + "Content-Disposition: form-data; name=\"title\"; filename=\"title\"\r\n" + "\r\n"
-                + "Home Assistant\r\n" + "--myBoundary--\r\n";
-
-        logger.trace("Sending {} bytes to TV. Message:{}", Integer.toString(content.length()), content);
-        Request request = httpClient.POST(baseUrlAndPort + "/");
-        request.timeout(3, TimeUnit.SECONDS);
-        request.header("Authorization", "Basic Og==");
-        request.header("Connection", "Keep-Alive");
-        // request.header("Content-Type", "multipart/form-data; boundary=--myBoundary");
-        request.header("User-Agent", "Dalvik/2.1.0 (Linux; U; Android 12; CPH2195 Build/SKQ1.210216.001)");
-        request.header("Host", "192.168.1.85:7676");
-        request.header("Accept-Encoding", "gzip");
-        request.content(new StringContentProvider(content), "multipart/form-data; boundary=--myBoundary");
-        request.header(HttpHeader.CONTENT_LENGTH, Integer.toString(content.length()));
-        String errorReason = "";
-        try {
-            ContentResponse contentResponse = request.send();
-            if (contentResponse.getStatus() == 200) {
-                logger.trace("Response back from TV:{}", contentResponse.getContentAsString());
-                return contentResponse.getContentAsString();
-            } else {
-                errorReason = String.format("Android Notification request failed with %d: %s",
-                        contentResponse.getStatus(), contentResponse.getReason());
-            }
-        } catch (InterruptedException e) {
-            errorReason = String.format("InterruptedException: %s", e.getMessage());
-        } catch (TimeoutException e) {
-            errorReason = "TimeoutException: WLED was not reachable on your network";
-        } catch (ExecutionException e) {
-            errorReason = String.format("ExecutionException: %s", e.getMessage());
-        }
-        logger.debug("Returned error message from sending to the TV:{}", errorReason);
-        return errorReason;
-    }
-
     public String sendPostMultipartRequest() {
         Request request = httpClient.POST(baseUrlAndPort + "/");
-        request.timeout(5, TimeUnit.SECONDS);
-        request.header("Authorization", "Basic Og==");
-        request.header("Connection", "Keep-Alive");
+        request.timeout(HTTP_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         request.header("Host", "192.168.1.85:7676");
+        // request.header("Host", config.address + ":" + config.port);
         request.header("User-Agent", null);// remove the auto added Jetty agent header
-        request.header("User-Agent", "Dalvik/2.1.0 (Linux; U; Android 12; CPH2195 Build/SKQ1.210216.001)");
-        // request.header("Accept-Encoding", "gzip, deflate, br");
+        // request.header("User-Agent", "Dalvik/2.1.0 (Linux; U; Android 12; CPH2195 Build/SKQ1.210216.001)");
+        request.header("User-Agent", "python-requests/2.31.0");
+        request.header("Accept-Encoding", null);
+        request.header("Accept-Encoding", "gzip, deflate, br");
         request.header("Accept", "*/*");
-        MultiPartContentProvider multiPart = new MultiPartContentProvider();
-        // multiPart.addFieldPart("hash",
-        // new StringContentProvider("\r\n" + "rS3ebOjDbBM7vkoNJibCHWWRyLT9N7Giw1ZFUkt+GZY="), null);
-        multiPart.addFieldPart("type", new StringContentProvider("0"), null);
-        multiPart.addFieldPart("title", new StringContentProvider("38AYmqUlyr0FtXfosV18jg=="), null);
-        multiPart.addFieldPart("msg", new StringContentProvider(
-                "AqHdWviqhWicqsrYH/MIpLezWE0uJSqs3fRwB4zrzapVgw3CmjRuPocdI7m7fXqAektRqYRKn/wECbujzAU8c4JAor6KnwLCnbAS8FsYT1DlRcHKgUhPAW2jC1KdL2vTWBfnlhOKX4q6u/THNt1ALQ=="),
-                null);
-        multiPart.addFieldPart("duration", new StringContentProvider("6"), null);
-        multiPart.addFieldPart("fontsize", new StringContentProvider("0"), null);
-        multiPart.addFieldPart("position", new StringContentProvider("0"), null);
-        multiPart.addFieldPart("width", new StringContentProvider("0"), null);
-        multiPart.addFieldPart("bkgcolor", new StringContentProvider("#607d8b"), null);
-        multiPart.addFieldPart("transparency", new StringContentProvider("0"), null);
-        multiPart.addFieldPart("offset", new StringContentProvider("0"), null);
-        multiPart.addFieldPart("offsety", new StringContentProvider("0"), null);
-        multiPart.addFieldPart("app", new StringContentProvider("Notifications for Android TV"), null);
-        multiPart.addFieldPart("demo", new StringContentProvider("true"), null);
-        multiPart.addFieldPart("force", new StringContentProvider("true"), null);
+        request.header("Connection", "keep-alive");
+        MultiPartContentProvider multiPart = new MultiPartContentProvider("9b991ded48683a4e8d7fa86bbf6cc218");
+        HttpFields httpFields = new HttpFields();
+        httpFields.add(HttpHeader.EXPIRES, "0");
         multiPart.addFilePart("filename", "icon.png",
-                new ByteBufferContentProvider(getIconData("qualityofservice-1.png")), null);
-        // multiPart.addFieldPart(null, new StringContentProvider("\r\n\r\n"), null);
+                new ByteBufferContentProvider(getIconData("qualityofservice-1.png")), httpFields);
 
-        // request.content(multiPart, "multipart/form-data; boundary="+multiPart.);
+        // multiPart.addFilePart("filename", "icon.png",
+        // new ByteBufferContentProvider(getIconData("qualityofservice-1.png")), null);
+
+        // multiPart.addFilePart("filename2", "image",
+        // new ByteBufferContentProvider(getIconData("qualityofservice-1.png")), null);
+
+        // httpFields = new HttpFields();
+        // httpFields.remove("Content-Type");
+        // multiPart.addFilePart("msg", "msg", new StringContentProvider("message here"), httpFields);
+        // multiPart.addFilePart("title", "title", new StringContentProvider("title here"), httpFields);
+        // multiPart.addFilePart("duration", "duration", new StringContentProvider("30"), httpFields);
+
+        // multiPart.addFilePart("fontsize", "fontsize", new StringContentProvider("0"), null);
+        // multiPart.addFilePart("position", "position", new StringContentProvider("0"), null);
+        // multiPart.addFilePart("bkgcolor", "bkgcolor", new StringContentProvider("#F44336"), null);
+        // multiPart.addFilePart("transparency", "transparency", new StringContentProvider("1"), null);
+        // multiPart.addFilePart("interrupt", "interrupt", new StringContentProvider("1"), null);
+
+        multiPart.addFieldPart("msg", new StringContentProvider("message here"), null);
+        multiPart.addFieldPart("title", new StringContentProvider("title here"), null);
+        multiPart.addFieldPart("duration", new StringContentProvider("30"), null);
+        // multiPart.addFieldPart("fontsize", new StringContentProvider("0"), null);
+        // multiPart.addFieldPart("position", new StringContentProvider("0"), null);
+        // multiPart.addFieldPart("width", new StringContentProvider("0"), null);
+        // multiPart.addFieldPart("bkgcolor", new StringContentProvider("#F44336"), null);
+        // multiPart.addFieldPart("transparency", new StringContentProvider("1"), null);
+        // multiPart.addFieldPart("interrupt", new StringContentProvider("1"), null);
+        // multiPart.addFieldPart("offset", new StringContentProvider("0"), null);
+        // multiPart.addFieldPart("offsety", new StringContentProvider("0"), null);
+        // multiPart.addFieldPart("app", new StringContentProvider("Notifications for Android TV"), null);
+        // multiPart.addFieldPart("demo", new StringContentProvider("true"), null);
+        // multiPart.addFieldPart("force", new StringContentProvider("true"), null);
+
+        // OutputStreamContentProvider imageContent = new OutputStreamContentProvider();
+        // multiPart.addFilePart("filename", "icon.png", imageContent, null);
 
         request.content(multiPart);
-        request.header(HttpHeader.CONTENT_LENGTH, Long.toString(multiPart.getLength()));
+        request.header("Content-Length", Long.toString(multiPart.getLength()));
+        request.header("Content-Type", "multipart/form-data; boundary=9b991ded48683a4e8d7fa86bbf6cc218");
         String errorReason = "";
         try {
             ContentResponse contentResponse = request.send();
             if (contentResponse.getStatus() == 200) {
                 logger.trace("Response back from TV:{}", contentResponse.getContentAsString());
-
+                multiPart.close();
                 return contentResponse.getContentAsString();
             } else {
                 errorReason = String.format("Android Notification request failed with %d: %s",
@@ -273,7 +245,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
         } catch (InterruptedException e) {
             errorReason = String.format("InterruptedException: %s", e.getMessage());
         } catch (TimeoutException e) {
-            errorReason = "TimeoutException: WLED was not reachable on your network";
+            errorReason = "TimeoutException: TV was not reachable on your network";
         } catch (ExecutionException e) {
             errorReason = String.format("ExecutionException: %s", e.getMessage());
         }
@@ -284,7 +256,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
     public String sendPostMultipartRequest(String content) {
         logger.trace("Sending {} bytes to TV. Message:{}", Integer.toString(content.length()), content);
         Request request = httpClient.POST(baseUrlAndPort + "/");
-        request.timeout(3, TimeUnit.SECONDS);
+        request.timeout(HTTP_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         request.header("Authorization", "Basic Og==");
         request.header("Connection", "Keep-Alive");
         request.header("Host", "192.168.1.85:7676");
@@ -323,7 +295,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
     public String sendPostRequest(String content) {
         logger.trace("Sending {} bytes to TV. Message:{}", Integer.toString(content.length()), content);
         Request request = httpClient.POST(baseUrlAndPort + "/");
-        request.timeout(3, TimeUnit.SECONDS);
+        request.timeout(HTTP_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         request.header("Authorization", "Basic Og==");
         request.header("Connection", "Keep-Alive");
         request.header("Host", "192.168.1.85:7676");
@@ -386,7 +358,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
                 + "', 'application/octet-stream',{'Expires': '0'}), 'msg': 'It WORKS', 'title': 'Title text', 'fontsize': 0, 'bkgcolor':'#4CAF50'}";
         logger.trace("Sending {} bytes to TV. Message:{}", Integer.toString(content.length()), content);
         Request request = httpClient.POST(baseUrlAndPort + url);
-        request.timeout(3, TimeUnit.SECONDS);
+        request.timeout(HTTP_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         request.header("Authorization", "Basic Og==");
         request.header("Connection", "Keep-Alive");
         request.header("Host", "192.168.1.85:7676");
@@ -432,7 +404,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
 
     public String sendQueryRequest(String url) {
         Request request = httpClient.POST(baseUrlAndPort + url);
-        request.timeout(3, TimeUnit.SECONDS);
+        request.timeout(HTTP_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         request.header("Authorization", "Basic Og==");
         request.header("Connection", "Keep-Alive");
         request.header("Host", "192.168.1.85:7676");
@@ -465,7 +437,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
     public String sendJSONPostRequest(String url, String content) {
         logger.trace("Sending {} bytes to TV. Message:{}", Integer.toString(content.length()), content);
         Request request = httpClient.POST(baseUrlAndPort + url);
-        request.timeout(3, TimeUnit.SECONDS);
+        request.timeout(HTTP_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         request.header("Authorization", "Basic Og==");
         request.header("Connection", "Keep-Alive");
         request.header("Host", "192.168.1.85:7676");
@@ -505,7 +477,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
                 + "\"backgroundColor\": \"#ffffff\",\r\n" + "}\r\n" + "";
         logger.trace("Sending {} bytes to TV. Message:{}", Integer.toString(content.length()), content);
         Request request = httpClient.POST(baseUrlAndPort + url);
-        request.timeout(3, TimeUnit.SECONDS);
+        request.timeout(HTTP_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         request.header("Authorization", "Basic Og==");
         request.header("Connection", "Keep-Alive");
         request.header("Host", "192.168.1.85:7676");
@@ -604,6 +576,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
                     if (command instanceof OnOffType) {
                         sendQueryRequest("/show?title=openHAB&msg=TheTestMessageWorks&fontsize=" + fontSize
                                 + "&position=" + position);
+                        // sendPostMultipartRequest();
                     }
                     break;
                 case CHANNEL_SEND_NOTIFICATION:
@@ -640,6 +613,7 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
             baseUrlAndPort = "http://" + config.address + ":" + config.port;
         }
         startStreamServer(true);
+        updateStatus(ThingStatus.ONLINE);
         pollingFuture = scheduler.scheduleWithFixedDelay(this::pollState, 0, config.pollTime, TimeUnit.SECONDS);
     }
 
@@ -671,8 +645,9 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
             @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor,
             @Nullable String corner, @Nullable Integer duration) {
         try {
-            return "OK".equals(sendQueryRequest("/show?title=" + URLEncoder.encode(title, "UTF-8") + "&msg="
-                    + URLEncoder.encode(message, "UTF-8") + "&fontsize=" + fontSize + "&position=" + position));
+            return "OK".equals(sendQueryRequest("/show?title=" + URLEncoder.encode(title, "UTF-8").replace("+", "%20")
+                    + "&msg=" + URLEncoder.encode(message, "UTF-8").replace("+", "%20") + "&fontsize=" + fontSize
+                    + "&position=" + position));
         } catch (UnsupportedEncodingException e) {
             logger.warn("UnsupportedEncodingException:{}", e.getMessage());
         }
@@ -683,9 +658,9 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
             @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor,
             @Nullable String corner, @Nullable Integer duration) {
         try {
-            return "OK".equals(sendQueryRequest(
-                    "/show?title=openHAB&msg=" + URLEncoder.encode("Video is NOT implemented yet", "UTF-8")
-                            + "&fontsize=" + fontSize + "&position=" + position));
+            return "OK".equals(sendQueryRequest("/show?title=openHAB&msg="
+                    + URLEncoder.encode("Video is NOT implemented yet", "UTF-8").replace("+", "%20") + "&fontsize="
+                    + fontSize + "&position=" + position));
         } catch (UnsupportedEncodingException e) {
             logger.warn("UnsupportedEncodingException:{}", e.getMessage());
         }
@@ -696,9 +671,9 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
             @Nullable String largeIcon, @Nullable String smallIcon, @Nullable String smallIconColor,
             @Nullable String corner, @Nullable Integer duration) {
         try {
-            return "OK".equals(sendQueryRequest(
-                    "/show?title=openHAB&msg=" + URLEncoder.encode("Image is NOT implemented yet", "UTF-8")
-                            + "&fontsize=" + fontSize + "&position=" + position));
+            return "OK".equals(sendQueryRequest("/show?title=openHAB&msg="
+                    + URLEncoder.encode("Image is NOT implemented yet", "UTF-8").replace("+", "%20") + "&fontsize="
+                    + fontSize + "&position=" + position));
         } catch (UnsupportedEncodingException e) {
             logger.warn("UnsupportedEncodingException:{}", e.getMessage());
         }
@@ -709,7 +684,13 @@ public class AndroidTvNotificationsDisplayHandler extends BaseThingHandler {
             @Nullable String icon, @Nullable String iconColor, @Nullable String borderColor,
             @Nullable String backgroundColor, @Nullable Integer expiration, @Nullable String shape,
             @Nullable Boolean visible) {
-        logger.info("Feature only supported in TvOverlay app");
+        try {
+            return "OK".equals(sendQueryRequest("/show?title=openHAB&msg="
+                    + URLEncoder.encode("Fix Notifications are only in TvOverlay", "UTF-8").replace("+", "%20")
+                    + "&fontsize=" + fontSize + "&position=" + position));
+        } catch (UnsupportedEncodingException e) {
+            logger.warn("UnsupportedEncodingException:{}", e.getMessage());
+        }
         return false;
     }
 }

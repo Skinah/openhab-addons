@@ -100,13 +100,13 @@ public class StreamServerHandler extends ChannelInboundHandlerAdapter {
                         case "/id":
                             // logger.debug("From binding to TV/id:{}", handler.sendGetRequest("/id"));
                             // sendOk(ctx);
-                            // sendEmptyOk(ctx);
+                            sendEmptyOk(ctx);
                             // handler.sendJSONPostRequestWithPNG("/notify", "qualityofservice-1.png");
-                            // handler.sendPostMultipartRequest();
+                            handler.sendPostMultipartRequest();
                             break;
                         default:
                             sendEmptyOk(ctx);
-                            logger.info("Stream Server recieved unknown request {}:{}", httpRequest.method(),
+                            logger.debug("Stream Server recieved unknown request {}:{}", httpRequest.method(),
                                     httpRequest.uri());
                     }
 
