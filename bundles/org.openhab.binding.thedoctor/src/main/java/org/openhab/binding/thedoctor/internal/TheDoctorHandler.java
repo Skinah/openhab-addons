@@ -24,12 +24,15 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.core.addon.AddonInfo;
+import org.openhab.core.addon.AddonInfoRegistry;
 import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.library.unit.Units;
 import org.openhab.core.thing.ChannelUID;
@@ -37,7 +40,6 @@ import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingStatus;
 import org.openhab.core.thing.binding.BaseThingHandler;
 import org.openhab.core.types.Command;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import oshi.SystemInfo;
@@ -60,6 +62,7 @@ public class TheDoctorHandler extends BaseThingHandler {
     private boolean macOS = false;
     private boolean windows = false;
     private boolean rasberry = false;
+    private long leakValueWarned = 0;
     private long days = 0;
     private long refHeap = 0;
     private long maxHeap = 0;
@@ -127,17 +130,18 @@ public class TheDoctorHandler extends BaseThingHandler {
 
     private void longCheck() {
         long cleanedHeap = checkHeap(true);
-        if (refHeap == 0) {
+        if (refHeap == 0) { // first run only
             refHeap = cleanedHeap;
             if (cleanedHeap < 18) {
                 logger.info(
                         "You have a bigger heap size then needed as it is only {}% full after garbage collection. Consider decreasing your Java -Xmx size unless you are still adding new things and bindings.",
                         cleanedHeap);
             }
-        } else if (cleanedHeap > refHeap + 4) {
+        } else if (cleanedHeap > refHeap + 5 && cleanedHeap > leakValueWarned) {
             logger.warn(
                     "Heap has increased from {} to {} and may indicate a memory leak if this number keeps growing. This binding has a channel you can use to watch the heap with.",
                     refHeap, cleanedHeap);
+            leakValueWarned = cleanedHeap;
         }
         updateState(CHANNEL_CLEANED_HEAP, new QuantityType<>(cleanedHeap, Units.PERCENT));
         LocalDateTime now = LocalDateTime.now();
@@ -289,6 +293,17 @@ public class TheDoctorHandler extends BaseThingHandler {
                 default:
                     logger.info("Unknown OS:{}, please report this message so your OS can be handled correctly", os);
             }
+        }
+
+        AddonInfoRegistry addonInfoRegistry = new AddonInfoRegistry();
+        Set<AddonInfo> addons = addonInfoRegistry.getAddonInfos();
+        for (AddonInfo addon : addons) {
+            logger.info("The addon name:{}", addon.getName());
+            logger.info("The addon description:{}", addon.getDescription());
+            logger.info("The addon id:{}", addon.getId());
+            logger.info("The addon serv id:{}", addon.getServiceId());
+            logger.info("The addon source:{}", addon.getSourceBundle());
+            logger.info("The addon uid:{}", addon.getUID());
         }
         updateStatus(ThingStatus.ONLINE);
         pollingFuture = scheduler.scheduleWithFixedDelay(this::checkHealth, 0, config.refresh, TimeUnit.SECONDS);
