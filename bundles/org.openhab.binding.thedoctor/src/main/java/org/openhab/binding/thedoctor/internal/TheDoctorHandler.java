@@ -24,15 +24,12 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.core.addon.AddonInfo;
-import org.openhab.core.addon.AddonInfoRegistry;
 import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.library.unit.Units;
 import org.openhab.core.thing.ChannelUID;
@@ -233,11 +230,11 @@ public class TheDoctorHandler extends BaseThingHandler {
             if (ram > maxRam) {
                 maxRam = ram;
                 if (maxHeap < 80) {
-                    logger.info(
+                    logger.warn(
                             "BAD : RAM is now {}% full, but you can improve that by decreasing your Java -Xmx size as your heap appears to be larger than needed.",
                             ram);
                 } else {
-                    logger.info("BAD : RAM is now {}% full", ram);
+                    logger.warn("BAD : RAM is now {}% full", ram);
                 }
             } else {
                 logger.debug("BAD : RAM is now {}% full", ram);
@@ -294,17 +291,6 @@ public class TheDoctorHandler extends BaseThingHandler {
                 default:
                     logger.info("Unknown OS:{}, please report this message so your OS can be handled correctly", os);
             }
-        }
-
-        AddonInfoRegistry addonInfoRegistry = new AddonInfoRegistry();
-        Set<AddonInfo> addons = addonInfoRegistry.getAddonInfos();
-        for (AddonInfo addon : addons) {
-            logger.info("The addon name:{}", addon.getName());
-            logger.info("The addon description:{}", addon.getDescription());
-            logger.info("The addon id:{}", addon.getId());
-            logger.info("The addon serv id:{}", addon.getServiceId());
-            logger.info("The addon source:{}", addon.getSourceBundle());
-            logger.info("The addon uid:{}", addon.getUID());
         }
         updateStatus(ThingStatus.ONLINE);
         pollingFuture = scheduler.scheduleWithFixedDelay(this::checkHealth, 0, config.refresh, TimeUnit.SECONDS);

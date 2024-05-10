@@ -34,8 +34,10 @@ import org.osgi.service.component.annotations.Component;
 @NonNullByDefault
 @Component(configurationPid = "binding.thedoctor", service = ThingHandlerFactory.class)
 public class TheDoctorHandlerFactory extends BaseThingHandlerFactory {
-
     private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Set.of(THING_TYPE_DOCTOR);
+
+    public TheDoctorHandlerFactory() {
+    }
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
