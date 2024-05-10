@@ -164,7 +164,7 @@ public class TheDoctorHandler extends BaseThingHandler {
         Path filePath = Path.of("/sys/devices/platform/soc/soc:firmware/get_throttled");
         try {
             String content = Files.readString(filePath);
-            int code = Integer.decode(content.strip());
+            int code = Integer.decode("0x" + content.strip());
 
             if (code != 0) {
                 logger.warn("BAD : Full Pi throttle code is {}", code);
