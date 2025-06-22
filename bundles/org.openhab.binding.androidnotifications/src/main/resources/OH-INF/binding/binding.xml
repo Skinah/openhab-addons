@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<binding:binding id="androidnotifications" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:binding="https://openhab.org/schemas/binding/v1.0.0"
+	xsi:schemaLocation="https://openhab.org/schemas/binding/v1.0.0 https://openhab.org/schemas/binding-1.0.0.xsd">
+
+	<name>Android Notifications Binding</name>
+	<description>This binding can send messages, pictures and video streams to your Android based TV. It requires either
+		`TvOverlay` or `Android TV Notifications` Google Play Store app to connect with on your TV.</description>
+
+</binding:binding>

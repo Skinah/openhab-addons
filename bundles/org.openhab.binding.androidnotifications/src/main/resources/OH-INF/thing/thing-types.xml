@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thing:thing-descriptions bindingId="androidnotifications"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:thing="https://openhab.org/schemas/thing-description/v1.0.0"
+	xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
+
+	<thing-type id="nfatvdisplay">
+		<label>Notifications for Android TV Display Connection</label>
+		<description>Notifications for Android TV is a Google Play store app by Christian Fees. Use this thing for each of
+			your TV's that have this app installed and setup correctly.</description>
+
+		<channels>
+			<channel id="sendNotification" typeId="sendNotification"/>
+			<channel id="sendTestNotification" typeId="sendTestNotification"/>
+			<channel id="displayNotifications" typeId="displayNotifications"/>
+			<channel id="displayCorner" typeId="displayCorner"/>
+			<channel id="fontSize" typeId="fontSize"/>
+		</channels>
+
+		<config-description>
+			<parameter name="address" type="text" required="true">
+				<context>network-address</context>
+				<label>Address</label>
+				<description>Enter just the IP or Hostname without the port or http/s</description>
+			</parameter>
+			<parameter name="port" type="integer" required="true" min="1" max="65535">
+				<label>Port</label>
+				<description>This port will be used for sending messages to your TV.
+				</description>
+				<default>7676</default>
+				<advanced>true</advanced>
+			</parameter>
+			<parameter name="pollTime" type="integer" min="5" unit="s" required="true">
+				<label>Poll Time</label>
+				<description>Time in seconds of how often to fetch the state of any settings and check if TV is turned on.</description>
+				<default>60</default>
+			</parameter>
+		</config-description>
+	</thing-type>
+
+	<thing-type id="tvoverlaydisplay">
+		<label>Tv Overlay Display Connection</label>
+		<description>TvOverlay is a Google Play store app by Tab Developer. Add one of these for each TV that is running the
+			correctly setup and working app.</description>
+
+		<channels>
+			<channel id="sendNotification" typeId="sendNotification"/>
+			<channel id="sendTestNotification" typeId="sendTestNotification"/>
+			<channel id="displayFixedNotifications" typeId="displayFixedNotifications"/>
+			<channel id="fixedNotificationsVisibility" typeId="fixedNotificationsVisibility"/>
+			<channel id="overlayVisibility" typeId="overlayVisibility"/>
+			<channel id="clockOverlayVisibility" typeId="clockOverlayVisibility"/>
+			<channel id="hotCorner" typeId="hotCorner"/>
+			<channel id="notificationDuration" typeId="notificationDuration"/>
+			<channel id="displayNotifications" typeId="displayNotifications"/>
+			<channel id="pixelShift" typeId="pixelShift"/>
+		</channels>
+
+		<config-description>
+			<parameter name="address" type="text" required="true">
+				<context>network-address</context>
+				<label>Address</label>
+				<description>Enter just the IP or Hostname without the port or http/s</description>
+			</parameter>
+			<parameter name="resendFixed" type="boolean" required="true">
+				<label>Resend Fixed Notifications</label>
+				<description>If set, will automatically re-send any fixed notifications when the TV comes back online. You can
+					remove individual messages so they are not sent with visible=false and same ID.</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="port" type="integer" required="true" min="1" max="65535">
+				<label>Port</label>
+				<description>This port will be used for sending messages to your TV.
+				</description>
+				<default>5001</default>
+				<advanced>true</advanced>
+			</parameter>
+			<parameter name="pollTime" type="integer" min="5" unit="s" required="true">
+				<label>Poll Time</label>
+				<description>Time in seconds of how often to fetch the state of any settings and check if TV is turned on.</description>
+				<default>60</default>
+			</parameter>
+		</config-description>
+	</thing-type>
+
+	<channel-type id="fixedNotificationsVisibility">
+		<item-type>Dimmer</item-type>
+		<label>Fixed Notifications Visibility</label>
+		<description>Change how transparent the fixed notifications are on the screen</description>
+	</channel-type>
+
+	<channel-type id="overlayVisibility">
+		<item-type>Dimmer</item-type>
+		<label>Overlay Visibility</label>
+		<description>Change how transparent or dark the entire screen is through the use of a full screen black background</description>
+	</channel-type>
+	<channel-type id="clockOverlayVisibility">
+		<item-type>Dimmer</item-type>
+		<label>Clock Overlay Visibility</label>
+		<description>Change how transparent the clock is on the screen</description>
+	</channel-type>
+
+	<channel-type id="hotCorner">
+		<item-type>String</item-type>
+		<label>Hot Corner</label>
+		<description>The corner used to display new messages in</description>
+		<state readOnly="false">
+			<options>
+				<option value="top_start">Top left</option>
+				<option value="top_end">Top right</option>
+				<option value="bottom_start">Bottom left</option>
+				<option value="bottom_end">Bottom right</option>
+			</options>
+		</state>
+	</channel-type>
+
+	<channel-type id="displayCorner">
+		<item-type>String</item-type>
+		<label>Display Corner</label>
+		<description>The corner used to display new messages in</description>
+		<state readOnly="false">
+			<options>
+				<option value="4">Centre</option>
+				<option value="3">Top left</option>
+				<option value="2">Top right</option>
+				<option value="1">Bottom left</option>
+				<option value="0">Bottom right</option>
+			</options>
+		</state>
+	</channel-type>
+
+	<channel-type id="fontSize">
+		<item-type>String</item-type>
+		<label>Font Size</label>
+		<description>How large to make the font in messages</description>
+		<state readOnly="false">
+			<options>
+				<option value="1">Small</option>
+				<option value="0">Medium</option>
+				<option value="2">Large</option>
+				<option value="3">Max</option>
+			</options>
+		</state>
+	</channel-type>
+
+	<channel-type id="notificationDuration">
+		<item-type>Number:Time</item-type>
+		<label>Notification Duration</label>
+		<description>The duration the station will be opened the next time it is switched on.</description>
+		<category>Time</category>
+		<state>
+			<options>
+				<option value="2s">2 Seconds</option>
+				<option value="5s">5 Seconds</option>
+				<option value="10s">10 Seconds</option>
+				<option value="15s">15 Seconds</option>
+				<option value="20s">20 Seconds</option>
+				<option value="25s">25 Seconds</option>
+				<option value="30s">30 Seconds</option>
+				<option value="45s">45 Seconds</option>
+				<option value="1min">1 Minute</option>
+				<option value="2min">2 Minutes</option>
+				<option value="3min">3 Minutes</option>
+				<option value="4min">4 Minutes</option>
+				<option value="5min">5 Minutes</option>
+				<option value="10min">10 Minutes</option>
+				<option value="15min">15 Minutes</option>
+				<option value="20min">20 Minutes</option>
+				<option value="25min">25 Minutes</option>
+				<option value="30min">30 Minutes</option>
+				<option value="40min">40 Minutes</option>
+				<option value="50min">50 Minutes</option>
+				<option value="60min">1 Hour</option>
+			</options>
+		</state>
+	</channel-type>
+
+	<channel-type id="displayFixedNotifications">
+		<item-type>Switch</item-type>
+		<label>Display Fixed Notifications</label>
+		<description>Whether or not the fixed notifications are displayed.</description>
+	</channel-type>
+
+	<channel-type id="pixelShift">
+		<item-type>Switch</item-type>
+		<label>Pixel Shift</label>
+		<description>Whether to move the overlay every 2 minutes to avoid screen burn-in</description>
+	</channel-type>
+
+	<channel-type id="displayNotifications">
+		<item-type>Switch</item-type>
+		<label>Display Notifications</label>
+		<description>Whether or not the notifications are displayed.</description>
+	</channel-type>
+
+	<channel-type id="backgroundColor" advanced="true">
+		<item-type>Color</item-type>
+		<label>Background Color</label>
+		<description>Allows you to change the background color for fixed notifications</description>
+	</channel-type>
+
+	<channel-type id="sendTestNotification">
+		<item-type>Switch</item-type>
+		<label>Send Test Notification</label>
+		<description>Use this channel to test if the binding is talking to the app successfully.</description>
+	</channel-type>
+
+	<channel-type id="sendNotification">
+		<item-type>String</item-type>
+		<label>Send Notification</label>
+		<description>Use this channel to send quick messages by changing the `default list item widget` to
+			`input-list-item`,
+			`text` as input type and enable the send button.</description>
+	</channel-type>
+
+</thing:thing-descriptions>
