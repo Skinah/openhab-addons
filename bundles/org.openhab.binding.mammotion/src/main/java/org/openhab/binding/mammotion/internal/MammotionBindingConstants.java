@@ -27,11 +27,11 @@ import org.openhab.core.thing.ThingTypeUID;
 public class MammotionBindingConstants {
 
     private static final String BINDING_ID = "mammotion";
-    public static final String MAMMOTION_CLOUD_URL = "https://domestic.mammotion.com";
+    public static final String MAMMOTION_CLOUD_URL = "https://id.mammotion.com";
     public static final String CLIENT_ID = "MADKALUBAS";
     public static final String CLIENT_SECRET = "GshzGRZJjuMUgd2sYHM7";
     public static final String PUBLIC_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtX1Qo3gdR3Zwst2T0IQLCSrhWiRfnvPl6K47kSt6MGHo2+LUe0vPCJufHRJvIv7xjhz+8vZ0LEmK49BgP0RSmjGvOjJMnAw2C6g6NqfktdCJTP0sX5zOCHCmddMaNkOXoBvUHLmty+nH3GnWmIwaCRtViVlzBL5Nkmr9gMbo0BoCFzZ5WEuF34y3P6aNllShlFg2gJOPgZu2APM3EUayRGvbJduv0vIYlnRAybP49W9ps+/L/6Th2VfwlT+MiDHnSPNwA1QY6wpoPbRbZ9uUy0AQckw3mjVrY+mhDRI9ESbPaZCzwOWBQnGnHVGVbWjK8uCMYprvTzqxHvS0iSU5cwIDAQAB";
-    public static final int HTTP_TIMEOUT_SECONDS = 30;
+    public static final int HTTP_TIMEOUT_SECONDS = 10;
 
     // List of all Thing Type UIDs
 
