@@ -54,7 +54,7 @@ public class MammotionHandlerFactory extends BaseThingHandlerFactory {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
         if (THING_TYPE_MAMMOTION.equals(thingTypeUID)) {
-            return new MammotionHandler((Bridge) thing, httpClient);
+            return new BridgeHandler((Bridge) thing, httpClient);
         }
         if (THING_TYPE_MOWER.equals(thingTypeUID)) {
             return new MowerHandler(thing);
