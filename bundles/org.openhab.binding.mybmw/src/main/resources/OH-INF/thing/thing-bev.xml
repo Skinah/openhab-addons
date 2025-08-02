@@ -11,6 +11,7 @@
 
 		<label>Electric Vehicle</label>
 		<description>Battery Electric Vehicle (BEV)</description>
+		<semantic-equipment-tag>Vehicle</semantic-equipment-tag>
 
 		<channel-groups>
 			<channel-group id="update" typeId="ev-vehicle-update"/>
@@ -29,7 +30,7 @@
 		</channel-groups>
 
 		<properties>
-			<property name="thingTypeVersion">3</property>
+			<property name="thingTypeVersion">4</property>
 		</properties>
 
 		<representation-property>vin</representation-property>

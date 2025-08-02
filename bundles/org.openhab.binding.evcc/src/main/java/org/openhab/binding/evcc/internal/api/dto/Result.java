@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2010-2024 Contributors to the openHAB project
+/*
+ * Copyright (c) 2010-2025 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -12,7 +12,9 @@
  */
 package org.openhab.binding.evcc.internal.api.dto;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -22,6 +24,8 @@ import com.google.gson.annotations.SerializedName;
  *
  * @author Florian Hotze - Initial contribution
  * @author Luca Arnecke - update to evcc version 0.123.1
+ * @author Daniel Kötting - update to evcc version 0.133.0
+ * @author Marcel Goerentz - Replace invalid chars with hyphens in vehicles map
  */
 public class Result {
     // Data types from https://github.com/evcc-io/evcc/blob/master/api/api.go
@@ -32,8 +36,8 @@ public class Result {
     @SerializedName("batteryCapacity")
     private float batteryCapacity;
 
-    @SerializedName("batteryConfigured")
-    private boolean batteryConfigured;
+    @SerializedName("battery")
+    private Battery[] battery;
 
     @SerializedName("batteryPower")
     private float batteryPower;
@@ -47,11 +51,14 @@ public class Result {
     @SerializedName("batteryMode")
     private String batteryMode;
 
+    @SerializedName("gridPower")
+    private Float gridPower;
+
+    @SerializedName("grid")
+    private Grid grid;
+
     @SerializedName("gridConfigured")
     private boolean gridConfigured;
-
-    @SerializedName("gridPower")
-    private float gridPower;
 
     @SerializedName("homePower")
     private float homePower;
@@ -71,8 +78,8 @@ public class Result {
     @SerializedName("residualPower")
     private float residualPower;
 
-    @SerializedName("pvConfigured")
-    private boolean pvConfigured;
+    @SerializedName("pv")
+    private PV[] pv;
 
     @SerializedName("pvPower")
     private float pvPower;
@@ -90,17 +97,17 @@ public class Result {
     private String availableVersion;
 
     /**
+     * @return all configured batteries
+     */
+    public Battery[] getBattery() {
+        return battery;
+    }
+
+    /**
      * @return battery's capacity
      */
     public float getBatteryCapacity() {
         return batteryCapacity;
-    }
-
-    /**
-     * @return whether battery is configured
-     */
-    public boolean getBatteryConfigured() {
-        return batteryConfigured;
     }
 
     /**
@@ -160,17 +167,24 @@ public class Result {
     }
 
     /**
-     * @return whether grid is configured
+     * @return gridPower (before evcc version 0.133.0)
      */
-    public boolean getGridConfigured() {
-        return gridConfigured;
+    public Float getGridPower() {
+        return gridPower;
     }
 
     /**
-     * @return grid's power
+     * @return all grid related values (since evcc version 0.133.0)
      */
-    public float getGridPower() {
-        return gridPower;
+    public Grid getGrid() {
+        return grid;
+    }
+
+    /**
+     * @return is grid configured (since evcc version 0.133.0)
+     */
+    public boolean getGridConfigured() {
+        return gridConfigured;
     }
 
     /**
@@ -188,10 +202,10 @@ public class Result {
     }
 
     /**
-     * @return whether pv is configured
+     * @return all configured PVs
      */
-    public boolean getPvConfigured() {
-        return pvConfigured;
+    public PV[] getPV() {
+        return pv;
     }
 
     /**
@@ -209,7 +223,17 @@ public class Result {
     }
 
     public Map<String, Vehicle> getVehicles() {
-        return vehicles;
+        Map<String, Vehicle> correctedMap = new HashMap<>();
+        for (Entry<String, Vehicle> entry : vehicles.entrySet()) {
+            // The key from the vehicles map is used as uid, so it should not contain any disallowed chars
+            // If necessary replace the forbidden chars with hyphens
+            String key = entry.getKey();
+            if (!key.matches("[a-zA-Z0-9_-]+")) {
+                key = key.replaceAll("[^a-zA-Z0-9_-]", "-");
+            }
+            correctedMap.put(key, entry.getValue());
+        }
+        return correctedMap;
     }
 
     /**

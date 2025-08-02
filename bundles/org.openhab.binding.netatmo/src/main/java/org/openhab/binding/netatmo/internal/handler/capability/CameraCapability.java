@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2010-2024 Contributors to the openHAB project
+/*
+ * Copyright (c) 2010-2025 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -18,6 +18,7 @@ import static org.openhab.binding.netatmo.internal.utils.ChannelTypeUtils.*;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriBuilderException;
@@ -36,10 +37,12 @@ import org.openhab.binding.netatmo.internal.handler.CommonInterface;
 import org.openhab.binding.netatmo.internal.handler.channelhelper.CameraChannelHelper;
 import org.openhab.binding.netatmo.internal.handler.channelhelper.ChannelHelper;
 import org.openhab.binding.netatmo.internal.providers.NetatmoDescriptionProvider;
+import org.openhab.binding.netatmo.internal.utils.ChannelTypeUtils;
 import org.openhab.core.config.core.Configuration;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.types.Command;
+import org.openhab.core.types.RefreshType;
 import org.openhab.core.types.State;
 import org.openhab.core.types.StateOption;
 import org.openhab.core.types.UnDefType;
@@ -70,15 +73,15 @@ public class CameraCapability extends HomeSecurityThingCapability {
             List<ChannelHelper> channelHelpers) {
         super(handler, descriptionProvider, channelHelpers);
         this.personChannelUID = new ChannelUID(thingUID, GROUP_LAST_EVENT, CHANNEL_EVENT_PERSON_ID);
-        this.cameraHelper = (CameraChannelHelper) channelHelpers.stream().filter(c -> c instanceof CameraChannelHelper)
+        this.cameraHelper = (CameraChannelHelper) channelHelpers.stream().filter(CameraChannelHelper.class::isInstance)
                 .findFirst().orElseThrow(() -> new IllegalArgumentException(
                         "CameraCapability must find a CameraChannelHelper, please file a bug report."));
     }
 
     @Override
     public void initialize() {
-        hasSubEventGroup = !thing.getChannelsOfGroup(GROUP_SUB_EVENT).isEmpty();
-        hasLastEventGroup = !thing.getChannelsOfGroup(GROUP_LAST_EVENT).isEmpty();
+        hasSubEventGroup = !getThing().getChannelsOfGroup(GROUP_SUB_EVENT).isEmpty();
+        hasLastEventGroup = !getThing().getChannelsOfGroup(GROUP_LAST_EVENT).isEmpty();
     }
 
     @Override
@@ -94,9 +97,11 @@ public class CameraCapability extends HomeSecurityThingCapability {
             eventHelper.setUrls(newVpnUrl, localUrl);
         }
         vpnUrl = newVpnUrl;
-        if (!SdCardStatus.SD_CARD_WORKING.equals(newData.getSdStatus())
-                || !AlimentationStatus.ALIM_CORRECT_POWER.equals(newData.getAlimStatus())) {
-            statusReason = "%s, %s".formatted(newData.getSdStatus(), newData.getAlimStatus());
+        if (!SdCardStatus.SD_CARD_WORKING.equals(newData.getSdStatus())) {
+            statusReason = newData.getSdStatus().toString();
+        }
+        if (!AlimentationStatus.ALIM_CORRECT_POWER.equals(newData.getAlimStatus())) {
+            statusReason = newData.getAlimStatus().toString();
         }
     }
 
@@ -115,20 +120,18 @@ public class CameraCapability extends HomeSecurityThingCapability {
         // The channel should get triggered at last (after super and sub methods), because this allows rules to access
         // the new updated data from the other channels.
         final String eventType = event.getEventType().name();
-        handler.recurseUpToHomeHandler(handler)
-                .ifPresent(homeHandler -> homeHandler.triggerChannel(CHANNEL_HOME_EVENT, eventType));
-        handler.triggerChannel(CHANNEL_HOME_EVENT, eventType);
+        handler.recurseUpToHomeHandler(handler).ifPresent(
+                homeHandler -> homeHandler.triggerChannel(GROUP_SECURITY_EVENT, CHANNEL_HOME_EVENT, eventType));
+        handler.triggerChannel(GROUP_SECURITY_EVENT, CHANNEL_HOME_EVENT, eventType);
     }
 
     private void updateSubGroup(WebhookEvent event, String group) {
         handler.updateState(group, CHANNEL_EVENT_TYPE, toStringType(event.getEventType()));
         handler.updateState(group, CHANNEL_EVENT_TIME, toDateTimeType(event.getTime()));
-        handler.updateState(group, CHANNEL_EVENT_SNAPSHOT, toRawType(event.getSnapshotUrl()));
-        handler.updateState(group, CHANNEL_EVENT_SNAPSHOT_URL, toStringType(event.getSnapshotUrl()));
-        handler.updateState(group, CHANNEL_EVENT_VIGNETTE, toRawType(event.getVignetteUrl()));
-        handler.updateState(group, CHANNEL_EVENT_VIGNETTE_URL, toStringType(event.getVignetteUrl()));
-        handler.updateState(group, CHANNEL_EVENT_SUBTYPE,
-                event.getSubTypeDescription().map(d -> toStringType(d)).orElse(UnDefType.NULL));
+        updatePictureIfUrlPresent(event.getSnapshotUrl(), group, CHANNEL_EVENT_SNAPSHOT, CHANNEL_EVENT_SNAPSHOT_URL);
+        updatePictureIfUrlPresent(event.getVignetteUrl(), group, CHANNEL_EVENT_VIGNETTE, CHANNEL_EVENT_VIGNETTE_URL);
+        handler.updateState(group, CHANNEL_EVENT_SUBTYPE, Objects.requireNonNull(
+                event.getSubTypeDescription().map(ChannelTypeUtils::toStringType).orElse(UnDefType.NULL)));
         final String message = event.getName();
         handler.updateState(group, CHANNEL_EVENT_MESSAGE,
                 message == null || message.isBlank() ? UnDefType.NULL : toStringType(message));
@@ -137,10 +140,21 @@ public class CameraCapability extends HomeSecurityThingCapability {
         handler.updateState(personChannelUID, personId);
     }
 
+    private void updatePictureIfUrlPresent(@Nullable String snapShotUrl, String group, String pictureChannel,
+            String urlChannel) {
+        if (snapShotUrl != null) {
+            handler.updateState(group, pictureChannel, toRawType(snapShotUrl));
+            handler.updateState(group, urlChannel, toStringType(snapShotUrl));
+        }
+    }
+
     @Override
     public void handleCommand(String channelName, Command command) {
         if (command instanceof OnOffType && CHANNEL_MONITORING.equals(channelName)) {
             getSecurityCapability().ifPresent(cap -> cap.changeStatus(localUrl, OnOffType.ON.equals(command)));
+        } else if (command instanceof RefreshType && CHANNEL_LIVEPICTURE.equals(channelName)) {
+            handler.updateState(GROUP_CAM_LIVE, CHANNEL_LIVEPICTURE,
+                    toRawType(cameraHelper.getLivePictureURL(localUrl != null, true)));
         } else {
             super.handleCommand(channelName, command);
         }
@@ -163,7 +177,7 @@ public class CameraCapability extends HomeSecurityThingCapability {
             HomeEvent event = cap.getDeviceLastEvent(handler.getId(), moduleType.apiName);
             if (event != null) {
                 result.add(event);
-                result.addAll(event.getSubevents());
+                result.addAll(event.getSubEvents());
             }
         });
         return result;

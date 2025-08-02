@@ -12,8 +12,10 @@
 
 		<label>L920 LightStrip</label>
 		<description>Tapo Smart Multicolor LED-Lightstrip</description>
+		<semantic-equipment-tag>LightStrip</semantic-equipment-tag>
 		<channel-groups>
 			<channel-group id="actuator" typeId="lightStrip"/>
+			<channel-group id="effects" typeId="lightEffectL920"/>
 			<channel-group id="device" typeId="deviceState"/>
 		</channel-groups>
 		<representation-property>macAddress</representation-property>
@@ -26,12 +28,7 @@
 		<label>Lightning Effect</label>
 		<description>Tapo Lightning Effects</description>
 		<channels>
-			<channel id="fxBrightness" typeId="dimmerChannel"/>
 			<channel id="fxName" typeId="l920fxList"/>
-			<channel id="fxColor1" typeId="colorChannel"/>
-			<channel id="fxColor2" typeId="colorChannel"/>
-			<channel id="fxColor3" typeId="colorChannel"/>
-			<channel id="fxColor4" typeId="colorChannel"/>
 		</channels>
 	</channel-group-type>
 
@@ -40,9 +37,13 @@
 		<item-type>String</item-type>
 		<label>Light Effect Theme</label>
 		<description>Name of lightning effect</description>
+		<tags>
+			<tag>Control</tag>
+			<tag>Mode</tag>
+		</tags>
 		<state readOnly="false">
 			<options>
-				<option value="">None (No FX)</option>
+				<option value="off">None (No FX)</option>
 				<option value="aurora">Aurora</option>
 				<option value="bubbling_calderon">Bubbling Calderon</option>
 				<option value="christmas">Christmas</option>

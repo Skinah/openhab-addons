@@ -1,7 +1,7 @@
 # evcc Binding
 
-This binding integrates [evcc - electric vehicle charging control](https://evcc.io), a project that provides a control center for electric vehicle charging.
-The binding requires evcc [version 0.123.1](https://github.com/evcc-io/evcc/releases/tag/0.123.1) or newer and is tested with this version.
+This binding integrates [evcc](https://evcc.io), an extensible **E**lectric **V**ehicle **C**harge **C**ontroller and home energy management system.
+The binding is compatible to evcc [version 0.123.1](https://github.com/evcc-io/evcc/releases/tag/0.123.1) or newer and was tested with [version 0.125.0](https://github.com/evcc-io/evcc/releases/tag/0.125.0).
 
 You can easily install and upgrade evcc on openHABian using `sudo openhabian-config`.
 
@@ -106,11 +106,11 @@ Please note that you have to replace _\<N\>_ with your loadpoint id/number.
 
 Those channels exist:
 
-* 1 per configured loadpoint with `chargerFeatureHeating = false`:
-  * These channels point to the heating device that is currently active/connected at/to the loadpoint
-  * Please note that you have to replace _\<N\>_ with your loadpoint id/number
-* 1 per configured vehicle:
-  * Please note that you have to replace _\<ID\>_ with your vehicle id/name
+- 1 per configured loadpoint with `chargerFeatureHeating = false`:
+  - These channels point to the heating device that is currently active/connected at/to the loadpoint
+  - Please note that you have to replace _\<N\>_ with your loadpoint id/number
+- 1 per configured vehicle:
+  - Please note that you have to replace _\<ID\>_ with your vehicle id/name
 
 | Channel                                            | Type                 | Read/Write | Description                                                              |
 |----------------------------------------------------|----------------------|------------|--------------------------------------------------------------------------|
@@ -126,11 +126,11 @@ Those channels exist:
 
 Those channels exist:
 
-* 1 per configured loadpoint with `chargerFeatureHeating = true`:
-  * These channels point to the heating device that is currently active/connected at/to the loadpoint
-  * Please note that you have to replace _\<N\>_ with your loadpoint id/number
-* 1 per configured heating device:
-  * Please note that you have to replace _\<ID\>_ with your heating device id/name
+- 1 per configured loadpoint with `chargerFeatureHeating = true`:
+  - These channels point to the heating device that is currently active/connected at/to the loadpoint
+  - Please note that you have to replace _\<N\>_ with your loadpoint id/number
+- 1 per configured heating device:
+  - Please note that you have to replace _\<ID\>_ with your heating device id/name
 
 | Channel                                                 | Type               | Read/Write | Description                                                           |
 |---------------------------------------------------------|--------------------|------------|-----------------------------------------------------------------------|
